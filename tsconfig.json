@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* Target & Module */
+    "target": "ES2022",                          /* Modern Node.js supports ES2022 well */
+    "module": "CommonJS",                        /* CommonJS allows imports without file extension */
+    "moduleResolution": "Node16",
+    "rootDir": "./src",                          /* Source directory */
+    "outDir": "./dist",                         /* Output directory after compilation */
+    
+    /* Strict Checks */
+    "strict": true,                              /* Enable all strict type checks */
+    "noImplicitAny": true,                       /* Disallow implicit 'any' types */
+    "strictNullChecks": true,                    /* Strict null/undefined checks */
+    
+    /* Module Resolution */
+    "esModuleInterop": true,                     /* Enable interop for CommonJS packages like Express */
+    "skipLibCheck": true,                        /* Speed up compilation by skipping library type checks */
+    "forceConsistentCasingInFileNames": true,    /* Enforce consistent file name casing (important on macOS/Linux) */
+    
+    /* Prisma & Metadata */
+    "resolveJsonModule": true,                   /* Allow importing .json files */
+    "experimentalDecorators": true,              /* Useful if you later use TypeORM or NestJS */
+    "emitDecoratorMetadata": true,
+    
+    /* Advanced */
+    "sourceMap": true,                           /* Enables debugging TypeScript directly in VS Code */
+    "removeComments": true,                      /* Remove comments on build to reduce file size */
+    "types": ["reflect-metadata", "node"]
+  },
+  "include": ["src/**/*", "prisma.config.ts"],   /* Only compile code in the src directory */
+  "exclude": ["node_modules", "**/*.spec.ts"]    /* Exclude node_modules and test files from build */
+}
