@@ -25,8 +25,8 @@
     /* Advanced */
     "sourceMap": true,                           /* Enables debugging TypeScript directly in VS Code */
     "removeComments": true,                      /* Remove comments on build to reduce file size */
-    "types": ["reflect-metadata", "node"]
+    "types": ["reflect-metadata", "node", "jest"]
   },
   "include": ["src/**/*", "prisma.config.ts"],   /* Only compile code in the src directory */
-  "exclude": ["node_modules", "**/*.spec.ts"]    /* Exclude node_modules and test files from build */
+  "exclude": ["node_modules"]
 }
