@@ -19,4 +19,43 @@ export class EmployeeController {
       next(error);
     }
   }
+
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = parseInt(req.params["id"] as string);
+      const employee = await this.employeeService.getEmployeeById(id);
+      res.status(200).json(employee);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const employee = await this.employeeService.createEmployee(req.body);
+      res.status(201).json(employee);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = parseInt(req.params["id"] as string);
+      const employee = await this.employeeService.updateEmployee(id, req.body);
+      res.status(200).json(employee);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = parseInt(req.params["id"] as string);
+      const employee = await this.employeeService.deleteEmployee(id);
+      res.status(200).json(employee);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
