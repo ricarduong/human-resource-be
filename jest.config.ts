@@ -7,6 +7,12 @@ const config: Config = {
   testMatch: ["**/*.spec.ts"],
   moduleFileExtensions: ["ts", "js", "json"],
   clearMocks: true,
+  transformIgnorePatterns: [
+    "/node_modules/(?!(inversify|@inversifyjs)/)",
+  ],
+  moduleNameMapper: {
+    "^inversify$": "<rootDir>/src/__mocks__/inversify.ts",
+  },
 };
 
 export default config;

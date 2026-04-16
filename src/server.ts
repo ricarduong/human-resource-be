@@ -1,19 +1,18 @@
+import 'dotenv/config';
 import express, { Application, Request, Response } from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import { PrismaClient } from '@prisma/client';
 import 'reflect-metadata';
 import employeeRoutes from './routes/employeeRoutes';
+import authRoutes from './routes/authRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 import { requestIdMiddleware } from './middlewares/requestId';
+import { authenticate } from './middlewares/authenticate';
 import { container } from './containers/inversify.config';
 import { TYPES } from './constants/types';
 import { Logger } from './utils/Logger';
-
-dotenv.config();
-
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 const logger = new Logger('Server');
@@ -39,7 +38,11 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', message: 'HRM Service is running' });
 });
 
-// Routes
+// Public routes (no auth required)
+app.use('/api/auth', authRoutes);
+
+// Protected routes
+app.use(authenticate);
 app.use('/api/employees', employeeRoutes);
 
 // Error Handler (must be placed after all routes)

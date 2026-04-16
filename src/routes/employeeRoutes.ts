@@ -7,6 +7,7 @@ import { validateCreateEmployee } from "../middlewares/validate-create-employee.
 const router = Router();
 const employeeController = container.get<EmployeeController>(TYPES.EmployeeController);
 
+
 router.get("/", (req, res, next) => employeeController.getAll(req, res, next));
 router.get("/:id", (req, res, next) => employeeController.getById(req, res, next));
 router.post("/", validateCreateEmployee, (req, res, next) => employeeController.create(req, res, next));

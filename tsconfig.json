@@ -3,7 +3,7 @@
     /* Target & Module */
     "target": "ES2022",                          /* Modern Node.js supports ES2022 well */
     "module": "CommonJS",                        /* CommonJS allows imports without file extension */
-    "moduleResolution": "Node16",
+    "moduleResolution": "bundler",
     "rootDir": "./src",                          /* Source directory */
     "outDir": "./dist",                         /* Output directory after compilation */
     
