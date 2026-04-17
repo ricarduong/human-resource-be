@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hrm-backend
+  namespace: dev-project
+  labels:
+    app.kubernetes.io/name: hrm-backend
+    app.kubernetes.io/component: api
+spec:
+  type: ClusterIP
+  selector:
+    app: hrm-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http    # references containerPort name "http" (3000)
+      protocol: TCP

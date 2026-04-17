@@ -1,0 +1,38 @@
+# Version control
+.git
+.gitignore
+
+# Node modules
+node_modules
+
+# Build output (will be generated inside container)
+dist
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Test files
+src/**/*.spec.ts
+src/**/*.test.ts
+src/test
+
+# Dev config
+jest.config.ts
+eslint.config.js
+.eslintrc.json
+
+# Docs & scripts
+README.md
+scripts
+
+# macOS
+.DS_Store
+
+# Docker
+Dockerfile
+.dockerignore
+
+# K8s manifests
+manifests

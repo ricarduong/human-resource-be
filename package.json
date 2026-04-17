@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:unit": "jest --testPathPattern=unit",
+    "test:unit": "jest --testPathPatterns=unit",
     "test:integration": "jest --testPathPattern=integration",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc -p tsconfig.build.json",
