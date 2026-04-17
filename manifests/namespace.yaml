@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-project
+  labels:
+    app.kubernetes.io/name: dev-project
+    app.kubernetes.io/managed-by: kustomize

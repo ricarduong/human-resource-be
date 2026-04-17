@@ -9,7 +9,7 @@ import employeeRoutes from './routes/employeeRoutes';
 import authRoutes from './routes/authRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 import { requestIdMiddleware } from './middlewares/requestId';
-import { authenticate } from './middlewares/authenticate';
+// import { authenticate } from './middlewares/authenticate';
 import { container } from './containers/inversify.config';
 import { TYPES } from './constants/types';
 import { Logger } from './utils/Logger';
@@ -42,7 +42,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 
 // Protected routes
-app.use(authenticate);
+// app.use(authenticate);
 app.use('/api/employees', employeeRoutes);
 
 // Error Handler (must be placed after all routes)

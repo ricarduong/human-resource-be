@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dev-project
+
+# Image tag is overridden by the CD workflow:
+#   kustomize edit set image hrm-backend=<user>/hrm-backend:sha-<sha>
+images:
+  - name: hrm-backend
+    newName: hrm-backend
+    newTag: latest
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: hrm
+  app.kubernetes.io/managed-by: kustomize

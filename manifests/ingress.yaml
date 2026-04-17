@@ -1,0 +1,36 @@
+# ---------------------------------------------------------------------------
+# Ingress for Rancher Desktop (k3s)
+#
+# Rancher Desktop ships with Traefik as the default ingress controller.
+# This manifest uses ingressClassName: traefik.
+#
+# If you have switched to nginx ingress, change:
+#   ingressClassName: traefik  →  ingressClassName: nginx
+#   and remove the traefik annotation.
+#
+# Access the API locally at: http://hrm.local/api/...
+# Add to /etc/hosts:  127.0.0.1  hrm.local
+# ---------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hrm-backend
+  namespace: dev-project
+  labels:
+    app.kubernetes.io/name: hrm-backend
+  annotations:
+    # Traefik-specific: use the web entrypoint for this ingress
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: hrm.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hrm-backend
+                port:
+                  name: http
