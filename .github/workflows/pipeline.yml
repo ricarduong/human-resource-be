@@ -94,7 +94,7 @@ jobs:
 
     steps:
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:sha-${{ needs.build.outputs.image_tag }}
           format: table
