@@ -34,7 +34,7 @@ spec:
         - name: hrm-backend
           image: hrm-backend:non-auth
           # Always use the locally-built image; never pull from a remote registry
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 3000

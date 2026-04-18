@@ -72,11 +72,36 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:sha-${{ steps.sha.outputs.short }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:latest
+          # Only tag with SHA — avoid overwriting :latest which makes rollback harder
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:sha-${{ steps.sha.outputs.short }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Clean up dangling images
+        if: always()
+        run: docker image prune -f
+
+  # ─────────────────────────────────────────────
+  # Job 2b: Security Scan
+  # Scan Docker image for vulnerabilities using Trivy
+  # Runs after build, in parallel with deploy
+  # ─────────────────────────────────────────────
+  security-scan:
+    name: Security Scan (Trivy)
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:sha-${{ needs.build.outputs.image_tag }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
 
   # ─────────────────────────────────────────────
   # Job 3: Deploy to Kubernetes
@@ -85,7 +110,7 @@ jobs:
   deploy:
     name: Deploy to k8s
     runs-on: local-mac
-    needs: build
+    needs: [build, security-scan]
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
 
     steps:
@@ -99,6 +124,10 @@ jobs:
       - name: Install kustomize
         uses: imranismail/setup-kustomize@v2
 
+      - name: Verify image is pullable from Docker Hub
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:sha-${{ needs.build.outputs.image_tag }}
+
       - name: Update image tag in kustomize
         run: |
           cd manifests
@@ -111,3 +140,9 @@ jobs:
         run: |
           kubectl rollout status deployment/hrm-backend \
             -n dev-project --timeout=180s
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Deploy failed — rolling back to previous revision"
+          kubectl rollout undo deployment/hrm-backend -n dev-project
