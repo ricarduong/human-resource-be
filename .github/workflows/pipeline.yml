@@ -72,6 +72,7 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/amd64,linux/arm64
           # Only tag with SHA — avoid overwriting :latest which makes rollback harder
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:sha-${{ steps.sha.outputs.short }}
           cache-from: type=gha
