@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────
 # Stage 1: Production dependencies
 # ─────────────────────────────────────────────
-FROM node:22-alpine AS prod-deps
+FROM node:24-alpine AS prod-deps
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN yarn install --frozen-lockfile --production && \
 # ─────────────────────────────────────────────
 # Stage 2: Builder
 # ─────────────────────────────────────────────
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -37,7 +37,7 @@ RUN yarn build
 # ─────────────────────────────────────────────
 # Stage 3: Production image
 # ─────────────────────────────────────────────
-FROM node:22-alpine AS production
+FROM node:24-alpine AS production
 
 WORKDIR /app
 
