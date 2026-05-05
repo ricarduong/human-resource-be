@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import 'reflect-metadata';
 import employeeRoutes from './routes/employeeRoutes';
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 import { requestIdMiddleware } from './middlewares/requestId';
 // import { authenticate } from './middlewares/authenticate';
@@ -44,6 +45,7 @@ app.use('/api/auth', authRoutes);
 // Protected routes
 // app.use(authenticate);
 app.use('/api/employees', employeeRoutes);
+app.use('/api/users', userRoutes);
 
 // Error Handler (must be placed after all routes)
 app.use(errorHandler);

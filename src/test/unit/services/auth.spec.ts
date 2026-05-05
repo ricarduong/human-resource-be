@@ -36,9 +36,13 @@ const mockUser = {
 
 function buildMockRepo(overrides: Partial<IUserRepository> = {}): IUserRepository {
   return {
+    findAll: jest.fn(),
+    findByEmailSafe: jest.fn().mockResolvedValue(null),
     findByGoogleId: jest.fn().mockResolvedValue(null),
     findByEmail: jest.fn().mockResolvedValue(null),
     create: jest.fn().mockResolvedValue(mockUser),
+    update: jest.fn(),
+    delete: jest.fn(),
     ...overrides,
   };
 }

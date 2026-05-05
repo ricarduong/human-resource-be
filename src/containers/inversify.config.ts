@@ -5,6 +5,8 @@ import { EmployeeService } from "../services/EmployeeService";
 import { EmployeeRepository } from "../repositories/EmployeeRepository";
 import { EmployeeController } from "../controllers/EmployeeController";
 import { UserRepository } from "../repositories/UserRepository";
+import { UserService } from "../services/UserService";
+import { UserController } from "../controllers/UserController";
 import { AuthService } from "../services/AuthService";
 import { AuthController } from "../controllers/AuthController";
 import { PrismaClient } from "@prisma/client";
@@ -19,6 +21,8 @@ container.bind(TYPES.EmployeeRepository).to(EmployeeRepository);
 container.bind(TYPES.EmployeeService).to(EmployeeService);
 container.bind(TYPES.EmployeeController).to(EmployeeController);
 container.bind(TYPES.UserRepository).to(UserRepository);
+container.bind(TYPES.UserService).to(UserService);
+container.bind(TYPES.UserController).to(UserController);
 container.bind(TYPES.AuthService).to(AuthService);
 container.bind(TYPES.AuthController).to(AuthController);
 

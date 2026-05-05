@@ -4,6 +4,8 @@ export const TYPES = {
     EmployeeService: Symbol.for("EmployeeService"),
     EmployeeController: Symbol.for("EmployeeController"),
     UserRepository: Symbol.for("UserRepository"),
+    UserService: Symbol.for("UserService"),
+    UserController: Symbol.for("UserController"),
     AuthService: Symbol.for("AuthService"),
     AuthController: Symbol.for("AuthController"),
 };

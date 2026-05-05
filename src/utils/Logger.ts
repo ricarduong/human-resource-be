@@ -1,10 +1,12 @@
 import pino, { Logger as PinoLogger } from "pino";
 
+const isTest = process.env.NODE_ENV === "test";
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const logger: PinoLogger = pino({
+  enabled: !isTest,
   level: process.env.LOG_LEVEL ?? "info",
-  transport: isDevelopment
+  transport: isDevelopment && !isTest
     ? { target: "pino-pretty", options: { colorize: true, translateTime: "SYS:standard" } }
     : undefined,
 });
