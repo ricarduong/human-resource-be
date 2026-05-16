@@ -8,6 +8,8 @@ import 'reflect-metadata';
 import employeeRoutes from './routes/employeeRoutes';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import teamRoutes from './routes/teamRoutes';
+import policyRoutes from './routes/policyRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 import { requestIdMiddleware } from './middlewares/requestId';
 // import { authenticate } from './middlewares/authenticate';
@@ -46,6 +48,8 @@ app.use('/api/auth', authRoutes);
 // app.use(authenticate);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/teams', teamRoutes);
+app.use('/api/policies', policyRoutes);
 
 // Error Handler (must be placed after all routes)
 app.use(errorHandler);

@@ -28,11 +28,30 @@ model User {
 }
 
 model Team {
-  id         Int      @id @default(autoincrement())
-  code       String   
-  name       String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Policy {
+  id              Int       @id @default(autoincrement())
+  policy_name     String    @db.VarChar(255)
+  base_hours      Float     @db.Double
+  core_time_start String    @db.VarChar(255)
+  core_time_end   String    @db.VarChar(255)
+  is_default      Boolean   @default(false)
+  status          Status    @default(ACTIVE)
+  createdAt       DateTime  @default(now())
+  createdBy       String    @db.VarChar(32)
+  updatedAt       DateTime? @updatedAt
+  updatedBy       String?   @db.VarChar(32)
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
 }
 
 enum Role {

@@ -8,4 +8,10 @@ export const TYPES = {
     UserController: Symbol.for("UserController"),
     AuthService: Symbol.for("AuthService"),
     AuthController: Symbol.for("AuthController"),
+    TeamRepository: Symbol.for("TeamRepository"),
+    TeamService: Symbol.for("TeamService"),
+    TeamController: Symbol.for("TeamController"),
+    PolicyRepository: Symbol.for("PolicyRepository"),
+    PolicyService: Symbol.for("PolicyService"),
+    PolicyController: Symbol.for("PolicyController"),
 };
