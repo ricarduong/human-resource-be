@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../errors/AppError";
+import { ValidationError } from "../../errors/AppError";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -7,13 +7,7 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-/**
- * Validates the request body for POST /employee.
- * Required fields: email (valid format), name, department.
- * Optional field: role (must be a string when provided).
- * Throws ValidationError (400) for any violation — caught by errorHandler.
- */
-export function validateCreateEmployee(
+export function create(
   req: Request,
   _res: Response,
   next: NextFunction

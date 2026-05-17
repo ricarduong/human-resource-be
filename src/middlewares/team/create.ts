@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../errors/AppError";
+import { ValidationError } from "../../errors/AppError";
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function validateCreateTeam(
+export function create(
   req: Request,
   _res: Response,
   next: NextFunction

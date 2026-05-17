@@ -2,7 +2,7 @@ import { Router } from "express";
 import { container } from "../containers/inversify.config";
 import { EmployeeController } from "../controllers/EmployeeController";
 import { TYPES } from "../constants/types";
-import { validateCreateEmployee } from "../middlewares/validate-create-employee.middleware";
+import { create as validateCreateEmployee } from "../middlewares/employee";
 
 const router = Router();
 const employeeController = container.get<EmployeeController>(TYPES.EmployeeController);

@@ -2,8 +2,7 @@ import { Router } from "express";
 import { container } from "../containers/inversify.config";
 import { PolicyController } from "../controllers/PolicyController";
 import { TYPES } from "../constants/types";
-import { validateCreatePolicy } from "../middlewares/validate-create-policy.middleware";
-import { validateUpdatePolicy } from "../middlewares/validate-update-policy.middleware";
+import { create as validateCreatePolicy, update as validateUpdatePolicy } from "../middlewares/policy";
 
 const router = Router();
 const policyController = container.get<PolicyController>(TYPES.PolicyController);

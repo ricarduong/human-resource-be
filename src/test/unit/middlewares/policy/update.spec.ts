@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Status } from "@prisma/client";
-import { ValidationError } from "../../../errors/AppError";
-import { validateUpdatePolicy } from "../../../middlewares/validate-update-policy.middleware";
+import { ValidationError } from "../../../../errors/AppError";
+import { update } from "../../../../middlewares/policy/update";
 
 function buildReq(params: Record<string, unknown>, body: Record<string, unknown>): Request {
   return { params, body } as unknown as Request;
@@ -18,11 +18,11 @@ function captureNext(): { next: NextFunction; received: () => unknown } {
   return { next, received: () => received };
 }
 
-describe("validateUpdatePolicy middleware", () => {
+describe("policy update middleware", () => {
   it("calls next() with no argument for a valid payload", () => {
     const { next, received } = captureNext();
 
-    validateUpdatePolicy(
+    update(
       buildReq(
         { id: "1" },
         {
@@ -45,7 +45,7 @@ describe("validateUpdatePolicy middleware", () => {
   it("passes ValidationError when id is invalid", () => {
     const { next, received } = captureNext();
 
-    validateUpdatePolicy(
+    update(
       buildReq({ id: "0" }, { policyName: "Flexible Working Hours", updatedBy: "manager" }),
       res,
       next
@@ -58,7 +58,7 @@ describe("validateUpdatePolicy middleware", () => {
   it("passes ValidationError when no updatable fields are provided", () => {
     const { next, received } = captureNext();
 
-    validateUpdatePolicy(buildReq({ id: "1" }, { updatedBy: "manager" }), res, next);
+    update(buildReq({ id: "1" }, { updatedBy: "manager" }), res, next);
 
     expect(received()).toBeInstanceOf(ValidationError);
     expect((received() as ValidationError).message).toMatch(/at least one/i);
@@ -67,7 +67,7 @@ describe("validateUpdatePolicy middleware", () => {
   it("passes ValidationError when updatedBy is missing", () => {
     const { next, received } = captureNext();
 
-    validateUpdatePolicy(buildReq({ id: "1" }, { policyName: "Flexible Working Hours" }), res, next);
+    update(buildReq({ id: "1" }, { policyName: "Flexible Working Hours" }), res, next);
 
     expect(received()).toBeInstanceOf(ValidationError);
     expect((received() as ValidationError).message).toMatch(/updatedBy/i);
@@ -76,7 +76,7 @@ describe("validateUpdatePolicy middleware", () => {
   it("passes ValidationError when coreTimeStart has invalid format", () => {
     const { next, received } = captureNext();
 
-    validateUpdatePolicy(
+    update(
       buildReq({ id: "1" }, { coreTimeStart: "25:00", updatedBy: "manager" }),
       res,
       next
@@ -89,7 +89,7 @@ describe("validateUpdatePolicy middleware", () => {
   it("passes ValidationError when status is invalid", () => {
     const { next, received } = captureNext();
 
-    validateUpdatePolicy(
+    update(
       buildReq({ id: "1" }, { status: "ARCHIVED", updatedBy: "manager" }),
       res,
       next

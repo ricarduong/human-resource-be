@@ -2,7 +2,7 @@ import { Router } from "express";
 import { container } from "../containers/inversify.config";
 import { UserController } from "../controllers/UserController";
 import { TYPES } from "../constants/types";
-import { validateUpdateUser, validateUserId } from "../middlewares/validate-update-user.middleware";
+import { id as validateUserId, update as validateUpdateUser } from "../middlewares/user";
 
 const router = Router();
 const userController = container.get<UserController>(TYPES.UserController);
