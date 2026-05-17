@@ -141,6 +141,13 @@ src/
 
 ---
 
+## Documentation
+
+- [Backend validation guidelines](docs/backend-validation-guidelines.md)
+- [Backend testing guidelines](docs/backend-testing-guidelines.md)
+
+---
+
 ## Security
 
 - **Helmet** — secures HTTP response headers

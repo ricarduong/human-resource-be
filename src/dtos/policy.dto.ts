@@ -1,5 +1,15 @@
 import { Status } from "@prisma/client";
 
+export interface CreatePolicyDto {
+  policyName: string;
+  baseHours: number;
+  coreTimeStart: string;
+  coreTimeEnd: string;
+  createdBy: string;
+  isDefault?: boolean;
+  status?: Status;
+}
+
 export interface PolicyDto {
   id: number;
   policyName: string;

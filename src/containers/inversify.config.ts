@@ -13,6 +13,7 @@ import { TeamRepository } from "../repositories/TeamRepository";
 import { TeamService } from "../services/TeamService";
 import { TeamController } from "../controllers/TeamController";
 import { PolicyRepository } from "../repositories/PolicyRepository";
+import { PolicyValidator } from "../validators/PolicyValidator";
 import { PolicyService } from "../services/PolicyService";
 import { PolicyController } from "../controllers/PolicyController";
 import { PrismaClient } from "@prisma/client";
@@ -35,6 +36,7 @@ container.bind(TYPES.TeamRepository).to(TeamRepository);
 container.bind(TYPES.TeamService).to(TeamService);
 container.bind(TYPES.TeamController).to(TeamController);
 container.bind(TYPES.PolicyRepository).to(PolicyRepository);
+container.bind(TYPES.PolicyValidator).to(PolicyValidator);
 container.bind(TYPES.PolicyService).to(PolicyService);
 container.bind(TYPES.PolicyController).to(PolicyController);
 
