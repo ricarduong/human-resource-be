@@ -10,6 +10,16 @@ export interface CreatePolicyDto {
   status?: Status;
 }
 
+export interface UpdatePolicyDto {
+  policyName?: string;
+  baseHours?: number;
+  coreTimeStart?: string;
+  coreTimeEnd?: string;
+  updatedBy: string;
+  isDefault?: boolean;
+  status?: Status;
+}
+
 export interface PolicyDto {
   id: number;
   policyName: string;

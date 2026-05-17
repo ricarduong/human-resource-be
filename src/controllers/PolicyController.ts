@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../constants/types";
 import { IPolicyService } from "../interfaces/IPolicyService";
-import { CreatePolicyDto } from "../dtos/policy.dto";
+import { CreatePolicyDto, UpdatePolicyDto } from "../dtos/policy.dto";
 
 @injectable()
 export class PolicyController {
@@ -26,6 +26,17 @@ export class PolicyController {
       const dto = req.body as CreatePolicyDto;
       const policy = await this.policyService.createPolicy(dto);
       res.status(201).json(policy);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = parseInt(req.params["id"] as string, 10);
+      const dto = req.body as UpdatePolicyDto;
+      const policy = await this.policyService.updatePolicy(id, dto);
+      res.status(200).json(policy);
     } catch (error) {
       next(error);
     }

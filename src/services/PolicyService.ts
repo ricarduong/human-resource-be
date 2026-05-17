@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
 import { TYPES } from "../constants/types";
-import { CreatePolicyDto, PolicyDto } from "../dtos/policy.dto";
+import { CreatePolicyDto, PolicyDto, UpdatePolicyDto } from "../dtos/policy.dto";
 import { IPolicyRepository } from "../interfaces/IPolicyRepository";
 import { PaginatedResult } from "../interfaces/IEmployeeRepository";
 import { IPolicyService } from "../interfaces/IPolicyService";
 import { IPolicyValidator } from "../interfaces/IPolicyValidator";
 import { Logger } from "../utils/Logger";
-import { ConflictError } from "../errors/AppError";
+import { ConflictError, NotFoundError } from "../errors/AppError";
 
 const logger = new Logger("PolicyService");
 
@@ -49,6 +49,52 @@ export class PolicyService implements IPolicyService {
       }
 
       logger.error("Failed to create policy", error);
+      throw error;
+    }
+  }
+
+  async updatePolicy(id: number, data: UpdatePolicyDto): Promise<PolicyDto> {
+    logger.info("Updating policy", { id });
+    this.policyValidator.validateUpdate(data);
+
+    try {
+      const existing = await this.policyRepository.findById(id);
+      if (!existing) {
+        throw new NotFoundError(`Policy with id ${id} not found`);
+      }
+
+      const mergedPolicy: CreatePolicyDto = {
+        policyName: data.policyName ?? existing.policyName,
+        baseHours: data.baseHours ?? existing.baseHours,
+        coreTimeStart: data.coreTimeStart ?? existing.coreTimeStart,
+        coreTimeEnd: data.coreTimeEnd ?? existing.coreTimeEnd,
+        createdBy: existing.createdBy,
+        isDefault: data.isDefault ?? existing.isDefault,
+        status: data.status ?? existing.status,
+      };
+
+      this.policyValidator.validateCreate(mergedPolicy);
+
+      if (data.policyName !== undefined) {
+        const policyWithSameName = await this.policyRepository.findByPolicyName(data.policyName);
+        if (policyWithSameName && policyWithSameName.id !== id) {
+          throw new ConflictError(`Policy with name ${data.policyName} already exists`);
+        }
+      }
+
+      const updatedPolicy = await this.policyRepository.update(id, data);
+      logger.info("Updated policy", { id });
+      return updatedPolicy;
+    } catch (error: unknown) {
+      const prismaError = error as { code?: string };
+      if (prismaError?.code === "P2002") {
+        throw new ConflictError(`Policy with name ${data.policyName} already exists`);
+      }
+      if (prismaError?.code === "P2025") {
+        throw new NotFoundError(`Policy with id ${id} not found`);
+      }
+
+      logger.error("Failed to update policy", error);
       throw error;
     }
   }

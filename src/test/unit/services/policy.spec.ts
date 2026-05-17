@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Status } from "@prisma/client";
-import { CreatePolicyDto, PolicyDto } from "../../../dtos/policy.dto";
+import { CreatePolicyDto, PolicyDto, UpdatePolicyDto } from "../../../dtos/policy.dto";
 import { IPolicyValidator } from "../../../interfaces/IPolicyValidator";
 import { PolicyService } from "../../../services/PolicyService";
 import { IPolicyRepository } from "../../../interfaces/IPolicyRepository";
 import { PaginatedResult } from "../../../interfaces/IEmployeeRepository";
-import { ConflictError, ValidationError } from "../../../errors/AppError";
+import { ConflictError, NotFoundError, ValidationError } from "../../../errors/AppError";
 
 const mockPolicy: PolicyDto = {
   id: 1,
@@ -38,11 +38,34 @@ const mockCreatePolicyDto: CreatePolicyDto = {
   status: Status.ACTIVE,
 };
 
+const mockUpdatePolicyDto: UpdatePolicyDto = {
+  policyName: "Flexible Working Hours",
+  baseHours: 7.5,
+  coreTimeStart: "10:00",
+  coreTimeEnd: "17:30",
+  updatedBy: "manager",
+  isDefault: false,
+  status: Status.INACTIVE,
+};
+
+const mockUpdatedPolicy: PolicyDto = {
+  ...mockPolicy,
+  policyName: "Flexible Working Hours",
+  baseHours: 7.5,
+  coreTimeStart: "10:00",
+  coreTimeEnd: "17:30",
+  isDefault: false,
+  status: Status.INACTIVE,
+  updatedBy: "manager",
+};
+
 function buildMockRepo(overrides: Partial<IPolicyRepository> = {}): IPolicyRepository {
   return {
     findAll: jest.fn().mockResolvedValue(mockPaginatedResult),
+    findById: jest.fn().mockResolvedValue(mockPolicy),
     findByPolicyName: jest.fn().mockResolvedValue(null),
     create: jest.fn().mockResolvedValue(mockPolicy),
+    update: jest.fn().mockResolvedValue(mockUpdatedPolicy),
     ...overrides,
   };
 }
@@ -50,6 +73,7 @@ function buildMockRepo(overrides: Partial<IPolicyRepository> = {}): IPolicyRepos
 function buildMockValidator(overrides: Partial<IPolicyValidator> = {}): IPolicyValidator {
   return {
     validateCreate: jest.fn(),
+    validateUpdate: jest.fn(),
     ...overrides,
   };
 }
@@ -174,5 +198,126 @@ describe("PolicyService.createPolicy", () => {
     const service = buildService(repo, validator);
 
     await expect(service.createPolicy(mockCreatePolicyDto)).rejects.toThrow("DB error");
+  });
+});
+
+describe("PolicyService.updatePolicy", () => {
+  it("updates policy when payload is valid and name remains unique", async () => {
+    const repo = buildMockRepo();
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    const result = await service.updatePolicy(1, mockUpdatePolicyDto);
+
+    expect(validator.validateUpdate).toHaveBeenCalledWith(mockUpdatePolicyDto);
+    expect(repo.findById).toHaveBeenCalledWith(1);
+    expect(validator.validateCreate).toHaveBeenCalledWith({
+      policyName: "Flexible Working Hours",
+      baseHours: 7.5,
+      coreTimeStart: "10:00",
+      coreTimeEnd: "17:30",
+      createdBy: "admin",
+      isDefault: false,
+      status: Status.INACTIVE,
+    });
+    expect(repo.findByPolicyName).toHaveBeenCalledWith("Flexible Working Hours");
+    expect(repo.update).toHaveBeenCalledWith(1, mockUpdatePolicyDto);
+    expect(result).toEqual(mockUpdatedPolicy);
+  });
+
+  it("uses existing values to validate partial time updates", async () => {
+    const repo = buildMockRepo();
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await service.updatePolicy(1, {
+      coreTimeStart: "08:30",
+      updatedBy: "manager",
+    });
+
+    expect(validator.validateCreate).toHaveBeenCalledWith({
+      policyName: "Standard Working Hours",
+      baseHours: 8,
+      coreTimeStart: "08:30",
+      coreTimeEnd: "17:00",
+      createdBy: "admin",
+      isDefault: true,
+      status: Status.ACTIVE,
+    });
+  });
+
+  it("throws NotFoundError when policy does not exist", async () => {
+    const repo = buildMockRepo({
+      findById: jest.fn().mockResolvedValue(null),
+    });
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(999, mockUpdatePolicyDto)).rejects.toThrow(NotFoundError);
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it("throws ConflictError when updated name already belongs to another policy", async () => {
+    const repo = buildMockRepo({
+      findByPolicyName: jest.fn().mockResolvedValue({
+        ...mockPolicy,
+        id: 2,
+        policyName: "Flexible Working Hours",
+      }),
+    });
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(1, mockUpdatePolicyDto)).rejects.toThrow(ConflictError);
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it("does not throw conflict when keeping the same name on the same policy", async () => {
+    const repo = buildMockRepo({
+      findByPolicyName: jest.fn().mockResolvedValue(mockPolicy),
+    });
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(1, {
+      policyName: "Standard Working Hours",
+      updatedBy: "manager",
+    })).resolves.toEqual(mockUpdatedPolicy);
+  });
+
+  it("propagates validation errors from update validator", async () => {
+    const repo = buildMockRepo();
+    const validator = buildMockValidator({
+      validateUpdate: jest.fn(() => {
+        throw new ValidationError("'baseHours' must be greater than 0");
+      }),
+    });
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(1, {
+      updatedBy: "manager",
+      baseHours: 0,
+    })).rejects.toThrow(ValidationError);
+    expect(repo.findById).not.toHaveBeenCalled();
+  });
+
+  it("maps Prisma unique errors to ConflictError", async () => {
+    const repo = buildMockRepo({
+      update: jest.fn().mockRejectedValue({ code: "P2002" }),
+    });
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(1, mockUpdatePolicyDto)).rejects.toThrow(ConflictError);
+  });
+
+  it("maps Prisma missing record errors to NotFoundError", async () => {
+    const repo = buildMockRepo({
+      update: jest.fn().mockRejectedValue({ code: "P2025" }),
+    });
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(1, mockUpdatePolicyDto)).rejects.toThrow(NotFoundError);
   });
 });
