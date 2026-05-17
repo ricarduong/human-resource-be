@@ -37,7 +37,7 @@ model Team {
 
 model Policy {
   id              Int       @id @default(autoincrement())
-  policy_name     String    @db.VarChar(255)
+  policy_name     String    @unique @db.VarChar(255)
   base_hours      Float     @db.Double
   core_time_start String    @db.VarChar(255)
   core_time_end   String    @db.VarChar(255)

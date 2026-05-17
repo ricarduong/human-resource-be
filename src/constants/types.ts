@@ -12,6 +12,7 @@ export const TYPES = {
     TeamService: Symbol.for("TeamService"),
     TeamController: Symbol.for("TeamController"),
     PolicyRepository: Symbol.for("PolicyRepository"),
+    PolicyValidator: Symbol.for("PolicyValidator"),
     PolicyService: Symbol.for("PolicyService"),
     PolicyController: Symbol.for("PolicyController"),
 };
