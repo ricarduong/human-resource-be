@@ -1,14 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../errors/AppError";
 import { Logger } from "../utils/Logger";
 
 const logger = new Logger("ErrorHandler");
-
-export class AppError extends Error {
-  constructor(public statusCode: number, message: string) {
-    super(message);
-    this.name = "AppError";
-  }
-}
 
 export function errorHandler(
   err: Error,
