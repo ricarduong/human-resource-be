@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Status } from "@prisma/client";
-import { ValidationError } from "../errors/AppError";
+import { ValidationError } from "../../errors/AppError";
 
 const VALID_STATUSES: Status[] = ["ACTIVE", "INACTIVE"];
 const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -9,7 +9,7 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function validateUpdatePolicy(
+export function update(
   req: Request,
   _res: Response,
   next: NextFunction

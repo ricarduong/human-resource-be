@@ -2,7 +2,7 @@ import { Router } from "express";
 import { container } from "../containers/inversify.config";
 import { TeamController } from "../controllers/TeamController";
 import { TYPES } from "../constants/types";
-import { validateCreateTeam } from "../middlewares/validate-create-team.middleware";
+import { create as validateCreateTeam } from "../middlewares/team";
 
 const router = Router();
 const teamController = container.get<TeamController>(TYPES.TeamController);

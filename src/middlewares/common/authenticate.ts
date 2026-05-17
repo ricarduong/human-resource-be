@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { Role } from "@prisma/client";
-import { UnauthorizedError } from "../errors/AppError";
+import { UnauthorizedError } from "../../errors/AppError";
 
 export interface JwtPayload {
   sub: number;

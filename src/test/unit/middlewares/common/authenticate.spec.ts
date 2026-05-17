@@ -1,11 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { authenticate } from "../../../middlewares/authenticate";
-import { UnauthorizedError } from "../../../errors/AppError";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+import { authenticate } from "../../../../middlewares/common/authenticate";
+import { UnauthorizedError } from "../../../../errors/AppError";
 
 function buildReq(headers: Record<string, string> = {}): Request {
   return { headers } as unknown as Request;
@@ -31,10 +27,6 @@ beforeEach(() => {
 afterEach(() => {
   delete process.env["JWT_SECRET"];
 });
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("authenticate middleware", () => {
   describe("missing / malformed Authorization header", () => {
