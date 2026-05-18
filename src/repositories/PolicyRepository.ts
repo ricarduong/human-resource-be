@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Status } from "@prisma/client";
 import { inject, injectable } from "inversify";
 import { CreatePolicyDto, PolicyDto, UpdatePolicyDto } from "../dtos/policy.dto";
 import { IPolicyRepository } from "../interfaces/IPolicyRepository";
@@ -114,6 +114,12 @@ export class PolicyRepository implements IPolicyRepository {
     });
 
     return policy ? this.toPolicyDto(policy) : null;
+  }
+
+  public async countActivePolicies(): Promise<number> {
+    return this.prisma.policy.count({
+      where: { status: Status.ACTIVE },
+    });
   }
 
   public async create(data: CreatePolicyDto): Promise<PolicyDto> {

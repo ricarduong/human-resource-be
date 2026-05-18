@@ -1,3 +1,4 @@
+import { Status } from "@prisma/client";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../constants/types";
 import { CreatePolicyDto, PolicyDto, UpdatePolicyDto } from "../dtos/policy.dto";
@@ -6,7 +7,7 @@ import { PaginatedResult } from "../interfaces/IEmployeeRepository";
 import { IPolicyService } from "../interfaces/IPolicyService";
 import { IPolicyValidator } from "../interfaces/IPolicyValidator";
 import { Logger } from "../utils/Logger";
-import { ConflictError, NotFoundError } from "../errors/AppError";
+import { ConflictError, NotFoundError, ValidationError } from "../errors/AppError";
 
 const logger = new Logger("PolicyService");
 
@@ -61,6 +62,20 @@ export class PolicyService implements IPolicyService {
       const existing = await this.policyRepository.findById(id);
       if (!existing) {
         throw new NotFoundError(`Policy with id ${id} not found`);
+      }
+
+      const nextStatus = data.status ?? existing.status;
+
+      if (data.status !== undefined && nextStatus !== existing.status && existing.isDefault) {
+        throw new ValidationError("Default policy status cannot be changed");
+      }
+
+      if (existing.status === Status.ACTIVE && nextStatus === Status.INACTIVE) {
+        const activePoliciesCount = await this.policyRepository.countActivePolicies();
+
+        if (activePoliciesCount <= 1) {
+          throw new ValidationError("At least one active policy must remain");
+        }
       }
 
       const mergedPolicy: CreatePolicyDto = {

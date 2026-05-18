@@ -64,6 +64,7 @@ function buildMockRepo(overrides: Partial<IPolicyRepository> = {}): IPolicyRepos
     findAll: jest.fn().mockResolvedValue(mockPaginatedResult),
     findById: jest.fn().mockResolvedValue(mockPolicy),
     findByPolicyName: jest.fn().mockResolvedValue(null),
+    countActivePolicies: jest.fn().mockResolvedValue(2),
     create: jest.fn().mockResolvedValue(mockPolicy),
     update: jest.fn().mockResolvedValue(mockUpdatedPolicy),
     ...overrides,
@@ -203,7 +204,12 @@ describe("PolicyService.createPolicy", () => {
 
 describe("PolicyService.updatePolicy", () => {
   it("updates policy when payload is valid and name remains unique", async () => {
-    const repo = buildMockRepo();
+    const repo = buildMockRepo({
+      findById: jest.fn().mockResolvedValue({
+        ...mockPolicy,
+        isDefault: false,
+      }),
+    });
     const validator = buildMockValidator();
     const service = buildService(repo, validator);
 
@@ -259,6 +265,10 @@ describe("PolicyService.updatePolicy", () => {
 
   it("throws ConflictError when updated name already belongs to another policy", async () => {
     const repo = buildMockRepo({
+      findById: jest.fn().mockResolvedValue({
+        ...mockPolicy,
+        isDefault: false,
+      }),
       findByPolicyName: jest.fn().mockResolvedValue({
         ...mockPolicy,
         id: 2,
@@ -269,6 +279,38 @@ describe("PolicyService.updatePolicy", () => {
     const service = buildService(repo, validator);
 
     await expect(service.updatePolicy(1, mockUpdatePolicyDto)).rejects.toThrow(ConflictError);
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it("throws ValidationError when changing status of a default policy", async () => {
+    const repo = buildMockRepo();
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(1, {
+      updatedBy: "manager",
+      status: Status.INACTIVE,
+    })).rejects.toThrow(new ValidationError("Default policy status cannot be changed"));
+    expect(repo.countActivePolicies).not.toHaveBeenCalled();
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it("throws ValidationError when inactivating the last active policy", async () => {
+    const repo = buildMockRepo({
+      findById: jest.fn().mockResolvedValue({
+        ...mockPolicy,
+        isDefault: false,
+      }),
+      countActivePolicies: jest.fn().mockResolvedValue(1),
+    });
+    const validator = buildMockValidator();
+    const service = buildService(repo, validator);
+
+    await expect(service.updatePolicy(1, {
+      updatedBy: "manager",
+      status: Status.INACTIVE,
+    })).rejects.toThrow(new ValidationError("At least one active policy must remain"));
+    expect(repo.countActivePolicies).toHaveBeenCalledTimes(1);
     expect(repo.update).not.toHaveBeenCalled();
   });
 
@@ -303,6 +345,10 @@ describe("PolicyService.updatePolicy", () => {
 
   it("maps Prisma unique errors to ConflictError", async () => {
     const repo = buildMockRepo({
+      findById: jest.fn().mockResolvedValue({
+        ...mockPolicy,
+        isDefault: false,
+      }),
       update: jest.fn().mockRejectedValue({ code: "P2002" }),
     });
     const validator = buildMockValidator();
@@ -313,6 +359,10 @@ describe("PolicyService.updatePolicy", () => {
 
   it("maps Prisma missing record errors to NotFoundError", async () => {
     const repo = buildMockRepo({
+      findById: jest.fn().mockResolvedValue({
+        ...mockPolicy,
+        isDefault: false,
+      }),
       update: jest.fn().mockRejectedValue({ code: "P2025" }),
     });
     const validator = buildMockValidator();
