@@ -8,13 +8,14 @@ generator client {
 }
 
 model Employee {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  name       String
-  role       Role     @default(STAFF)
-  department String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  name           String
+  role           Role             @default(STAFF)
+  department     String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  policyAssignments EmployeePolicy[]
 }
 
 model User {
@@ -36,17 +37,37 @@ model Team {
 }
 
 model Policy {
-  id              Int       @id @default(autoincrement())
-  policy_name     String    @unique @db.VarChar(255)
-  base_hours      Float     @db.Double
-  core_time_start String    @db.VarChar(255)
-  core_time_end   String    @db.VarChar(255)
-  is_default      Boolean   @default(false)
-  status          Status    @default(ACTIVE)
-  createdAt       DateTime  @default(now())
-  createdBy       String    @db.VarChar(32)
-  updatedAt       DateTime? @updatedAt
-  updatedBy       String?   @db.VarChar(32)
+  id                Int              @id @default(autoincrement())
+  policy_name       String           @unique @db.VarChar(255)
+  base_hours        Float            @db.Double
+  core_time_start   String           @db.VarChar(255)
+  core_time_end     String           @db.VarChar(255)
+  is_default        Boolean          @default(false)
+  status            Status           @default(ACTIVE)
+  createdAt         DateTime         @default(now())
+  createdBy         String           @db.VarChar(32)
+  updatedAt         DateTime?        @updatedAt
+  updatedBy         String?          @db.VarChar(32)
+  employeePolicies  EmployeePolicy[]
+}
+
+model EmployeePolicy {
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  policyId   Int
+  startDate  DateTime
+  endDate    DateTime?
+  priority   Int      @default(5)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  policy   Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, policyId, startDate])
+  @@index([employeeId])
+  @@index([policyId])
+  @@index([employeeId, startDate, endDate, priority])
 }
 
 enum Status {
