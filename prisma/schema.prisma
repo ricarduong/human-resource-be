@@ -8,66 +8,111 @@ generator client {
 }
 
 model Employee {
-  id             Int              @id @default(autoincrement())
-  email          String           @unique
-  name           String
-  role           Role             @default(STAFF)
-  department     String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  policyAssignments EmployeePolicy[]
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  googleId  String   @unique
-  email     String   @unique
-  name      String
-  role      Role     @default(STAFF)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Team {
-  id        Int      @id @default(autoincrement())
-  code      String   @unique
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Policy {
   id                Int              @id @default(autoincrement())
-  policy_name       String           @unique @db.VarChar(255)
-  base_hours        Float            @db.Double
-  core_time_start   String           @db.VarChar(255)
-  core_time_end     String           @db.VarChar(255)
-  is_default        Boolean          @default(false)
-  status            Status           @default(ACTIVE)
+  email             String           @unique
+  name              String
+  role              Role             @default(STAFF)
+  department        String
   createdAt         DateTime         @default(now())
   createdBy         String           @db.VarChar(32)
   updatedAt         DateTime?        @updatedAt
   updatedBy         String?          @db.VarChar(32)
-  employeePolicies  EmployeePolicy[]
+  policyAssignments EmployeePolicy[]
+  positionHistory   EmployeePosition[]
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  googleId  String    @unique
+  email     String    @unique
+  name      String
+  role      Role      @default(STAFF)
+  createdAt DateTime  @default(now())
+  createdBy String    @db.VarChar(32)
+  updatedAt DateTime? @updatedAt
+  updatedBy String?   @db.VarChar(32)
+}
+
+model Position {
+  id              Int       @id @default(autoincrement())
+  name            String    @unique
+  annualLeaveDays Int       @default(0)
+  createdAt       DateTime  @default(now())
+  createdBy       String    @db.VarChar(32)
+  updatedAt       DateTime? @updatedAt
+  updatedBy       String?   @db.VarChar(32)
+  employeeHistory EmployeePosition[]
+}
+
+model Team {
+  id        Int       @id @default(autoincrement())
+  code      String    @unique
+  name      String
+  createdAt DateTime  @default(now())
+  createdBy String    @db.VarChar(32)
+  updatedAt DateTime? @updatedAt
+  updatedBy String?   @db.VarChar(32)
+}
+
+model Department {
+  id        Int       @id @default(autoincrement())
+  code      String    @unique
+  name      String
+  createdAt DateTime  @default(now())
+  createdBy String    @db.VarChar(32)
+  updatedAt DateTime? @updatedAt
+  updatedBy String?   @db.VarChar(32)
+}
+
+model Policy {
+  id               Int              @id @default(autoincrement())
+  policy_name      String           @unique @db.VarChar(255)
+  base_hours       Float            @db.Double
+  core_time_start  String           @db.VarChar(255)
+  core_time_end    String           @db.VarChar(255)
+  is_default       Boolean          @default(false)
+  status           Status           @default(ACTIVE)
+  createdAt        DateTime         @default(now())
+  createdBy        String           @db.VarChar(32)
+  updatedAt        DateTime?        @updatedAt
+  updatedBy        String?          @db.VarChar(32)
+  employeePolicies EmployeePolicy[]
 }
 
 model EmployeePolicy {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   employeeId Int
   policyId   Int
   startDate  DateTime
   endDate    DateTime?
-  priority   Int      @default(5)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  priority   Int       @default(5)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   policy   Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
 
   @@unique([employeeId, policyId, startDate])
-  @@index([employeeId])
   @@index([policyId])
   @@index([employeeId, startDate, endDate, priority])
+}
+
+model EmployeePosition {
+  id         Int       @id @default(autoincrement())
+  employeeId Int
+  positionId Int
+  startDate  DateTime
+  endDate    DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  deletedAt  DateTime? @map("deleted_at")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  position Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, startDate])
+  @@index([positionId])
+  @@index([employeeId, deletedAt, startDate, endDate])
 }
 
 enum Status {
