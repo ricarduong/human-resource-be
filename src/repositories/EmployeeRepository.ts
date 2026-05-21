@@ -24,9 +24,10 @@ export class EmployeeRepository implements IEmployeeRepository {
           email: true,
           name: true,
           role: true,
-          department: true,
           createdAt: true,
+          createdBy: true,
           updatedAt: true,
+          updatedBy: true,
         },
       }),
       this.prisma.employee.count(),
@@ -43,9 +44,10 @@ export class EmployeeRepository implements IEmployeeRepository {
         email: true,
         name: true,
         role: true,
-        department: true,
         createdAt: true,
+        createdBy: true,
         updatedAt: true,
+        updatedBy: true,
       },
     }) as Promise<Employee | null>;
   }
@@ -58,9 +60,10 @@ export class EmployeeRepository implements IEmployeeRepository {
         email: true,
         name: true,
         role: true,
-        department: true,
         createdAt: true,
+        createdBy: true,
         updatedAt: true,
+        updatedBy: true,
       },
     }) as Promise<Employee | null>;
   }
@@ -73,9 +76,10 @@ export class EmployeeRepository implements IEmployeeRepository {
         email: true,
         name: true,
         role: true,
-        department: true,
         createdAt: true,
+        createdBy: true,
         updatedAt: true,
+        updatedBy: true,
       },
     }) as Promise<Employee>;
   }
@@ -89,9 +93,10 @@ export class EmployeeRepository implements IEmployeeRepository {
         email: true,
         name: true,
         role: true,
-        department: true,
         createdAt: true,
+        createdBy: true,
         updatedAt: true,
+        updatedBy: true,
       },
     }) as Promise<Employee>;
   }
@@ -104,9 +109,10 @@ export class EmployeeRepository implements IEmployeeRepository {
         email: true,
         name: true,
         role: true,
-        department: true,
         createdAt: true,
+        createdBy: true,
         updatedAt: true,
+        updatedBy: true,
       },
     }) as Promise<Employee>;
   }

@@ -12,7 +12,7 @@ export function create(
   _res: Response,
   next: NextFunction
 ): void {
-  const { email, name, role, department } = req.body as Record<string, unknown>;
+  const { email, name, role, createdBy } = req.body as Record<string, unknown>;
 
   if (!isNonEmptyString(name)) {
     return next(new ValidationError("'name' is required and must be a non-empty string"));
@@ -26,8 +26,8 @@ export function create(
     return next(new ValidationError("'email' must be a valid email address"));
   }
 
-  if (!isNonEmptyString(department)) {
-    return next(new ValidationError("'department' is required and must be a non-empty string"));
+  if (!isNonEmptyString(createdBy)) {
+    return next(new ValidationError("'createdBy' is required and must be a non-empty string"));
   }
 
   if (role !== undefined && !isNonEmptyString(role)) {

@@ -16,7 +16,9 @@ const mockSafeUser: SafeUser = {
   name: "Test User",
   role: "STAFF" as Role,
   createdAt: new Date(),
+  createdBy: "admin@example.com",
   updatedAt: new Date(),
+  updatedBy: "admin@example.com",
 };
 
 const mockPaginatedResult: PaginatedResult<SafeUser> = {
