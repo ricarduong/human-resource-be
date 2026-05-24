@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ Tương tác Quản lý và Cấu hình K8s Cluster</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tech-font {
+            font-family: 'Fira Code', monospace;
+        }
+        
+        /* Blueprint Background Pattern */
+        .blueprint-bg {
+            background-color: #080f1e;
+            background-image: 
+                linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+                linear-gradient(rgba(34, 211, 238, 0.02) 5px, transparent 5px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.02) 5px, transparent 5px);
+            background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+        }
+
+        /* Glow effects */
+        .glow-cyan {
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.4));
+        }
+        .glow-amber {
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
+        }
+        .glow-emerald {
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));
+        }
+        .glow-red {
+            filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5));
+        }
+
+        /* Connection line flow animation */
+        @keyframes flow-dash {
+            0% { stroke-dashoffset: 30; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .active-flow {
+            stroke-dasharray: 6, 3;
+            animation: flow-dash 1.5s linear infinite;
+        }
+    </style>
+</head>
+<body class="blueprint-bg min-h-screen text-slate-100 flex flex-col justify-between p-4 md:p-8">
+
+    <!-- Header -->
+    <header class="border-b border-cyan-500/30 pb-4 mb-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white tech-font mt-1">CLUSTER MANAGEMENT & CONFIGURATION</h1>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="switchContext('dev')" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-1.5 rounded tech-font text-xs transition duration-200 shadow-md">
+                    🔑 USE CONTEXT: DEV
+                </button>
+                <button onclick="switchContext('prod')" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3 py-1.5 rounded tech-font text-xs transition duration-200 shadow-md">
+                    🔑 USE CONTEXT: PROD
+                </button>
+                <button onclick="triggerQuotaOverload()" class="bg-red-500 hover:bg-red-400 text-white font-bold px-3 py-1.5 rounded tech-font text-xs transition duration-200 shadow-md">
+                    ⚠️ SIMULATE DEV QUOTA OVERLOAD
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 items-stretch my-auto">
+        
+        <!-- Interactive Panel (3 Cols) -->
+        <div class="lg:col-span-3 border border-cyan-500/30 bg-slate-950/60 rounded-xl p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+            <!-- Grid Watermark Label -->
+            <div class="absolute top-2 right-4 text-[10px] text-cyan-500/20 tech-font select-none">ARCHITECTURE-PLANE: INFRASTRUCTURE & ADMIN</div>
+            
+            <!-- SVG Workspace Canvas -->
+            <div class="w-full min-h-[400px] flex items-center justify-center relative py-6">
+                
+                <!-- CSS Overlay Flow Container to use SVG for responsive connecting paths -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none stroke-cyan-500/20 fill-none" stroke-width="2.5" id="svg-connections">
+                    <!-- Path from Context Client to Cluster Entry -->
+                    <path id="path-context-cluster" d="M 120, 200 L 260, 200" class="transition-all duration-500" />
+                    <!-- Branching Paths from Cluster Entry to Dev/Prod Namespaces -->
+                    <path id="path-to-dev" d="M 380, 200 C 420, 200 440, 110 490, 110" class="transition-all duration-500" />
+                    <path id="path-to-prod" d="M 380, 200 C 420, 200 440, 290 490, 290" class="transition-all duration-500" />
+                </svg>
+
+                <div class="w-full flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
+                    
+                    <!-- 1. CONTEXT SECTION (Client Side) -->
+                    <div id="section-context" onclick="selectElement('context')" class="cursor-pointer border-2 border-dashed border-amber-500/40 bg-amber-950/10 p-5 rounded-2xl flex flex-col items-center w-56 text-center transition-all duration-300 hover:border-amber-400 hover:bg-amber-950/20 glow-amber">
+                        <div class="text-[9px] tech-font bg-amber-950 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest mb-3">
+                            CLIENT-SIDE CONFIG
+                        </div>
+                        <div class="w-14 h-14 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/30 mb-2">
+                            <svg class="w-8 h-8 stroke-amber-400 fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                        </div>
+                        <span class="tech-font text-sm font-bold text-amber-400 tracking-wider">CONTEXT</span>
+                        <span class="text-[10px] text-slate-400 mt-1">Kubeconfig Profiles</span>
+                        
+                        <!-- Active Context Terminal Display -->
+                        <div class="mt-4 bg-slate-900/90 border border-amber-500/30 rounded px-2 py-1.5 w-full text-left tech-font text-[9px] text-slate-300">
+                            <div class="text-amber-400 font-bold">active-context:</div>
+                            <div id="current-context-label" class="truncate text-white">dev-admin@aws-k8s</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. CLUSTER CONTAINER (Infrastructure Plane) -->
+                    <div id="section-cluster" onclick="selectElement('cluster')" class="flex-grow max-w-lg border-2 border-cyan-500/40 bg-cyan-950/5 p-6 rounded-3xl flex flex-col items-center relative transition-all duration-300 hover:border-cyan-400">
+                        <div class="absolute -top-3 left-6 bg-slate-950 border border-cyan-500/40 text-[10px] text-cyan-400 font-bold tech-font px-2.5 py-0.5 rounded tracking-widest uppercase">
+                            PHYSICAL INFRASTRUCTURE PLANE
+                        </div>
+                        
+                        <!-- Cluster Header -->
+                        <div class="flex items-center gap-3 mb-8 w-full border-b border-cyan-500/20 pb-3">
+                            <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
+                                <svg class="w-6 h-6 stroke-cyan-400 fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                    <path d="M2 12h20"/>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <span class="tech-font text-xs font-bold text-cyan-300 block">K8s CLUSTER</span>
+                                <span class="text-[9px] text-slate-400">Total physical nodes sharing power</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. NAMESPACES INSIDE CLUSTER (Logical Level) -->
+                        <div class="w-full flex flex-col gap-6">
+                            
+                            <!-- Namespace DEV -->
+                            <div id="ns-dev" onclick="event.stopPropagation(); selectElement('ns_dev')" class="cursor-pointer border border-cyan-500/30 bg-slate-900/90 rounded-xl p-4 flex justify-between items-center transition-all duration-300 hover:border-white">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-xs tech-font">NS</div>
+                                    <div class="text-left">
+                                        <h4 class="text-xs font-bold tech-font text-cyan-300">namespace: dev</h4>
+                                        <p class="text-[9px] text-slate-400">Development / Testing Area</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <!-- Resource Quota Display -->
+                                    <div class="text-[9px] text-slate-400 tech-font">Resource Quota:</div>
+                                    <div id="dev-quota" class="text-[10px] text-cyan-300 font-bold tech-font">RAM: 4GB/8GB Max</div>
+                                </div>
+                            </div>
+
+                            <!-- Namespace PROD -->
+                            <div id="ns-prod" onclick="event.stopPropagation(); selectElement('ns_prod')" class="cursor-pointer border border-slate-700 bg-slate-900/90 rounded-xl p-4 flex justify-between items-center transition-all duration-300 hover:border-white">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs tech-font">NS</div>
+                                    <div class="text-left">
+                                        <h4 class="text-xs font-bold tech-font text-emerald-300">namespace: production</h4>
+                                        <p class="text-[9px] text-slate-400">Live Customer Environment</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <!-- Resource Quota Display -->
+                                    <div class="text-[9px] text-slate-400 tech-font">Resource Quota:</div>
+                                    <div class="text-[10px] text-emerald-400 font-bold tech-font">RAM: 12GB/32GB Max</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Toast Event Message Panel -->
+            <div id="toast" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 border border-cyan-400 text-cyan-300 text-xs px-4 py-2 rounded-md shadow-lg shadow-cyan-950/50 tech-font">
+                Listening for client-side API requests...
+            </div>
+        </div>
+
+        <!-- Detail Information panel (1 Col) -->
+        <div class="lg:col-span-1 flex flex-col gap-4">
+            <div class="border border-cyan-500/30 bg-slate-950/60 rounded-xl p-6 flex flex-col h-full relative">
+                <span class="text-[10px] text-cyan-400 tech-font tracking-widest">// MANAGEMENT TERMINAL</span>
+                <h2 id="detail-title" class="text-xl font-bold text-white tech-font mt-2 border-b border-cyan-500/20 pb-2">Cluster Setup</h2>
+                
+                <!-- Classification Badge -->
+                <div id="detail-badge" class="mt-3 inline-flex self-start bg-cyan-950 text-cyan-400 border border-cyan-500/30 text-[10px] font-semibold px-2 py-1 rounded tech-font">
+                    CATEGORY: SETUP & COFG
+                </div>
+                
+                <!-- Description Body -->
+                <p id="detail-desc" class="text-slate-300 text-sm mt-4 leading-relaxed flex-grow">
+                    Chọn bất kỳ thành phần nào trên bảng điều khiển bên trái để xem định nghĩa kỹ thuật, vai trò thực tế và cách nó hoạt động trong hạ tầng Kubernetes.
+                </p>
+
+                <!-- Technical Configuration Properties -->
+                <div class="border-t border-cyan-500/20 pt-4 mt-4 text-xs tech-font">
+                    <span class="text-slate-400">Thông số kỹ thuật:</span>
+                    <div id="detail-tech" class="text-cyan-300 mt-1">Sẵn sàng phân tích...</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl w-full mx-auto border-t border-cyan-500/30 pt-4 mt-6 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 tech-font gap-2">
+        <div>DESIGNED FOR TEAM KUBERNETES ON-BOARDING PRESENTATION</div>
+        <div>STABLE REVIEWS // MANAGEMENT LEVEL COFG 2026</div>
+    </footer>
+
+    <!-- Interactive Javascript Logic -->
+    <script>
+        const detailsData = {
+            context: {
+                title: "CONTEXT (Ngữ cảnh truy cập)",
+                badge: "METAPHOR: Chìa khóa & Thẻ phân quyền",
+                desc: "Context thực chất là một hồ sơ kết nối được định nghĩa trên laptop cá nhân của bạn (ở file ~/.kube/config). Context kết hợp thông tin: 'Bạn là ai?' + 'Bạn muốn tương tác với Cluster nào?' + 'Mặc định thao tác trên Namespace nào?'. Khi bạn đổi Context, lệnh của bạn sẽ đi thẳng đến đúng phân vùng được cấu hình.",
+                tech: "File: ~/.kube/config\nFormat: contexts:\n- context:\n    cluster: target-cluster\n    namespace: default-ns\n    user: developer-user"
+            },
+            cluster: {
+                title: "CLUSTER (Cụm máy chủ vật lý)",
+                badge: "METAPHOR: Tòa nhà văn phòng",
+                desc: "Là toàn bộ hạ tầng phần cứng gồm nhiều máy chủ vật lý hoặc máy ảo (Nodes) kết nối với nhau. Toàn bộ tài nguyên CPU, RAM, ổ cứng của Cluster được dồn lại thành một bể tài nguyên chung duy nhất để cung cấp cho các ứng dụng chạy bên trên.",
+                tech: "Control Plane: API Server, etcd, Scheduler\nWorker Nodes: EC2 Instances, Bare-metal\nShared Power: Unified CPU & RAM pool"
+            },
+            ns_dev: {
+                title: "NAMESPACE: DEV (Không gian thử nghiệm)",
+                badge: "METAPHOR: Phòng thí nghiệm nội bộ",
+                desc: "Một phân vùng ảo (logic) trong Cluster. Nơi các thành viên kiểm thử và phát triển ứng dụng. Nhằm tối ưu hóa chi phí, Namespace DEV dùng chung CPU/RAM vật lý của Cluster nhưng được áp đặt một hạn mức tài nguyên thấp để không lấn át môi trường thật.",
+                tech: "Logical Isolation: Namespace Object\nAccess Controls: Kubernetes RBAC\nResource Guardrail: ResourceQuota configured"
+            },
+            ns_prod: {
+                title: "NAMESPACE: PRODUCTION (Môi trường trực tiếp)",
+                badge: "METAPHOR: Văn phòng dịch vụ khách hàng",
+                desc: "Vùng bảo mật tối cao nhất trên Cluster. Chỉ có các code đã qua kiểm thử nghiệm ngặt mới được đưa vào đây. Được ưu tiên tài nguyên CPU/RAM cực lớn của Cluster để đảm bảo hiệu suất phục vụ khách hàng ngoài Internet thực tế.",
+                tech: "API Target: production-ns\nMonitoring: Prometheus Alerting active\nResource Priority: High QoS Guarantee"
+            }
+        };
+
+        // Redraw connections reactively to align paths properly to nodes
+        function updateSVGConnections(activeNamespace) {
+            const pathBase = document.getElementById("path-context-cluster");
+            const pathDev = document.getElementById("path-to-dev");
+            const pathProd = document.getElementById("path-to-prod");
+
+            // Reset flows
+            pathBase.className.baseVal = "";
+            pathDev.className.baseVal = "";
+            pathProd.className.baseVal = "";
+
+            // Style defaults
+            pathBase.style.stroke = "rgba(245, 158, 11, 0.4)"; // amber connection
+            pathDev.style.stroke = "rgba(34, 211, 238, 0.2)";
+            pathProd.style.stroke = "rgba(16, 185, 129, 0.2)";
+
+            // Highlight flow path based on active context
+            if (activeNamespace === "dev") {
+                pathBase.className.baseVal = "active-flow";
+                pathBase.style.stroke = "#f59e0b"; // glowing amber
+                
+                pathDev.className.baseVal = "active-flow";
+                pathDev.style.stroke = "#22d3ee"; // glowing cyan
+            } else if (activeNamespace === "prod") {
+                pathBase.className.baseVal = "active-flow";
+                pathBase.style.stroke = "#f59e0b"; // glowing amber
+                
+                pathProd.className.baseVal = "active-flow";
+                pathProd.style.stroke = "#10b981"; // glowing emerald
+            }
+        }
+
+        function switchContext(target) {
+            const contextLabel = document.getElementById("current-context-label");
+            const nsDev = document.getElementById("ns-dev");
+            const nsProd = document.getElementById("ns-prod");
+
+            // Reset UI states
+            nsDev.classList.remove("border-cyan-400", "glow-cyan");
+            nsProd.classList.remove("border-emerald-400", "glow-emerald");
+
+            if (target === "dev") {
+                contextLabel.innerText = "dev-admin@aws-k8s-cluster";
+                nsDev.classList.add("border-cyan-400", "glow-cyan");
+                showToast("🔑 Switched to Dev context. Destination: Namespace DEV");
+                updateSVGConnections("dev");
+                selectElement("ns_dev");
+            } else if (target === "prod") {
+                contextLabel.innerText = "prod-operator@aws-k8s-cluster";
+                nsProd.classList.add("border-emerald-400", "glow-emerald");
+                showToast("🔒 Switched to Prod context. WARNING: Direct production control active!");
+                updateSVGConnections("prod");
+                selectElement("ns_prod");
+            }
+        }
+
+        function triggerQuotaOverload() {
+            showToast("⚠️ WARNING: Pods in DEV namespace spiking RAM usages...");
+            const quotaDisplay = document.getElementById("dev-quota");
+            
+            setTimeout(() => {
+                quotaDisplay.innerText = "RAM: 8.1GB/8GB [OVERLOADED]";
+                quotaDisplay.className = "text-[10px] text-red-500 font-bold tech-font animate-pulse";
+                showToast("🚫 K8s Resource Quota Blocked further allocations in DEV!");
+            }, 1500);
+
+            // Recovery to normal after 5 seconds
+            setTimeout(() => {
+                quotaDisplay.innerText = "RAM: 4.2GB/8GB Max";
+                quotaDisplay.className = "text-[10px] text-cyan-300 font-bold tech-font";
+                showToast("✅ DevOps purged memory leak. DEV namespace back to normal limit.");
+            }, 6000);
+        }
+
+        function selectElement(key) {
+            const data = detailsData[key];
+            if (!data) return;
+
+            // Update details terminal view
+            document.getElementById("detail-title").innerText = data.title;
+            document.getElementById("detail-badge").innerText = data.badge;
+            document.getElementById("detail-desc").innerText = data.desc;
+            document.getElementById("detail-tech").innerHTML = data.tech.replace(/\n/g, "<br>");
+
+            // Style visual node highlights
+            document.querySelectorAll("#section-context, #section-cluster, #ns-dev, #ns-prod").forEach(el => {
+                el.classList.remove("border-white");
+            });
+
+            const elementMapping = {
+                context: "section-context",
+                cluster: "section-cluster",
+                ns_dev: "ns-dev",
+                ns_prod: "ns-prod"
+            };
+
+            const selectedElement = document.getElementById(elementMapping[key]);
+            if (selectedElement) {
+                selectedElement.classList.add("border-white");
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.classList.remove("hidden");
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3500);
+        }
+
+        // Initialize setup
+        window.onload = function() {
+            // Force active responsive SVG calculation on rendering
+            const svg = document.getElementById("svg-connections");
+            const parent = svg.parentElement;
+            svg.setAttribute("viewBox", `0 0 ${parent.clientWidth} ${parent.clientHeight}`);
+            
+            // Default to Dev context and selection on load
+            switchContext('dev');
+            selectElement('context');
+        };
+
+        // Window resize adapter for connection paths
+        window.onresize = function() {
+            const svg = document.getElementById("svg-connections");
+            const parent = svg.parentElement;
+            svg.setAttribute("viewBox", `0 0 ${parent.clientWidth} ${parent.clientHeight}`);
+        };
+    </script>
+</body>
+</html>
