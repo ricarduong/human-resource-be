@@ -21,7 +21,7 @@ describe("employee create middleware", () => {
     it("calls next() with no argument when all required fields are correct", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "alice@example.com", department: "Engineering" }),
+        buildReq({ name: "Alice", email: "alice@example.com", createdBy: "admin" }),
         res,
         next
       );
@@ -31,7 +31,7 @@ describe("employee create middleware", () => {
     it("calls next() with no argument when optional 'role' is also provided", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Bob", email: "bob@corp.io", department: "HR", role: "Manager" }),
+        buildReq({ name: "Bob", email: "bob@corp.io", role: "Manager", createdBy: "admin" }),
         res,
         next
       );
@@ -43,7 +43,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'name' is missing", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ email: "a@b.com", department: "IT" }),
+        buildReq({ email: "a@b.com", createdBy: "admin" }),
         res,
         next
       );
@@ -55,7 +55,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'name' is an empty string", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "   ", email: "a@b.com", department: "IT" }),
+        buildReq({ name: "   ", email: "a@b.com", createdBy: "admin" }),
         res,
         next
       );
@@ -66,7 +66,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'name' is not a string", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: 123, email: "a@b.com", department: "IT" }),
+        buildReq({ name: 123, email: "a@b.com", createdBy: "admin" }),
         res,
         next
       );
@@ -78,7 +78,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'email' is missing", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", department: "IT" }),
+        buildReq({ name: "Alice", createdBy: "admin" }),
         res,
         next
       );
@@ -89,7 +89,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'email' is an empty string", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "", department: "IT" }),
+        buildReq({ name: "Alice", email: "", createdBy: "admin" }),
         res,
         next
       );
@@ -100,7 +100,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'email' has an invalid format", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "not-an-email", department: "IT" }),
+        buildReq({ name: "Alice", email: "not-an-email", createdBy: "admin" }),
         res,
         next
       );
@@ -111,7 +111,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'email' is missing the domain part", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "alice@", department: "IT" }),
+        buildReq({ name: "Alice", email: "alice@", createdBy: "admin" }),
         res,
         next
       );
@@ -119,8 +119,8 @@ describe("employee create middleware", () => {
     });
   });
 
-  describe("'department' field", () => {
-    it("passes a ValidationError when 'department' is missing", () => {
+  describe("'createdBy' field", () => {
+    it("passes a ValidationError when 'createdBy' is missing", () => {
       const { next, received } = captureNext();
       create(
         buildReq({ name: "Alice", email: "alice@example.com" }),
@@ -128,18 +128,18 @@ describe("employee create middleware", () => {
         next
       );
       expect(received()).toBeInstanceOf(ValidationError);
-      expect((received() as ValidationError).message).toMatch(/department/i);
+      expect((received() as ValidationError).message).toMatch(/createdBy/i);
     });
 
-    it("passes a ValidationError when 'department' is an empty string", () => {
+    it("passes a ValidationError when 'createdBy' is an empty string", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "alice@example.com", department: "" }),
+        buildReq({ name: "Alice", email: "alice@example.com", createdBy: "" }),
         res,
         next
       );
       expect(received()).toBeInstanceOf(ValidationError);
-      expect((received() as ValidationError).message).toMatch(/department/i);
+      expect((received() as ValidationError).message).toMatch(/createdBy/i);
     });
   });
 
@@ -147,7 +147,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'role' is provided but is an empty string", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "alice@example.com", department: "IT", role: "  " }),
+        buildReq({ name: "Alice", email: "alice@example.com", role: "  ", createdBy: "admin" }),
         res,
         next
       );
@@ -158,7 +158,7 @@ describe("employee create middleware", () => {
     it("passes a ValidationError when 'role' is provided but is not a string", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "alice@example.com", department: "IT", role: 42 }),
+        buildReq({ name: "Alice", email: "alice@example.com", role: 42, createdBy: "admin" }),
         res,
         next
       );
@@ -168,7 +168,7 @@ describe("employee create middleware", () => {
     it("calls next() with no argument when 'role' is undefined (omitted)", () => {
       const { next, received } = captureNext();
       create(
-        buildReq({ name: "Alice", email: "alice@example.com", department: "IT" }),
+        buildReq({ name: "Alice", email: "alice@example.com", createdBy: "admin" }),
         res,
         next
       );

@@ -4,12 +4,12 @@ export interface CreateEmployeeDto {
   email: string;
   name: string;
   role?: Role;
-  department: string;
+  createdBy: string;
 }
 
 export interface UpdateEmployeeDto {
   email?: string;
   name?: string;
   role?: Role;
-  department?: string;
+  updatedBy?: string;
 }

@@ -12,13 +12,13 @@ model Employee {
   email             String           @unique
   name              String
   role              Role             @default(STAFF)
-  department        String
   createdAt         DateTime         @default(now())
   createdBy         String           @db.VarChar(32)
   updatedAt         DateTime?        @updatedAt
   updatedBy         String?          @db.VarChar(32)
   policyAssignments EmployeePolicy[]
   positionHistory   EmployeePosition[]
+  teamMemberships   EmployeeTeam[]
 }
 
 model User {
@@ -48,10 +48,15 @@ model Team {
   id        Int       @id @default(autoincrement())
   code      String    @unique
   name      String
+  departmentId Int?
   createdAt DateTime  @default(now())
   createdBy String    @db.VarChar(32)
   updatedAt DateTime? @updatedAt
   updatedBy String?   @db.VarChar(32)
+  department Department? @relation(fields: [departmentId], references: [id])
+  memberships EmployeeTeam[]
+
+  @@index([departmentId])
 }
 
 model Department {
@@ -62,6 +67,7 @@ model Department {
   createdBy String    @db.VarChar(32)
   updatedAt DateTime? @updatedAt
   updatedBy String?   @db.VarChar(32)
+  teams     Team[]
 }
 
 model Policy {
@@ -115,6 +121,24 @@ model EmployeePosition {
   @@index([employeeId, deletedAt, startDate, endDate])
 }
 
+model EmployeeTeam {
+  id             Int                @id @default(autoincrement())
+  employeeId     Int
+  teamId         Int
+  startDate      DateTime
+  endDate        DateTime?
+  assignmentType TeamAssignmentType @default(OFFICIAL)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime?          @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, teamId, startDate])
+  @@index([teamId])
+  @@index([employeeId, startDate, endDate])
+}
+
 enum Status {
   ACTIVE
   INACTIVE
@@ -124,4 +148,9 @@ enum Role {
   ADMIN
   MANAGER
   STAFF
+}
+
+enum TeamAssignmentType {
+  OFFICIAL
+  TEMPORARY
 }
