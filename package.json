@@ -20,7 +20,7 @@
   "license": "ISC",
   "resolutions": {
     "picomatch": "4.0.4",
-    "fast-uri": "3.1.1"
+    "fast-uri": "3.1.2"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.7.0",
