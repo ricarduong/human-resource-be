@@ -58,4 +58,14 @@ export class EmployeeController {
       next(error);
     }
   }
+
+  async assignPolicy(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const employeeId = parseInt(req.params["id"] as string);
+      const assignment = await this.employeeService.assignPolicyToEmployee(employeeId, req.body);
+      res.status(201).json(assignment);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

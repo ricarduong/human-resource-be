@@ -1,18 +1,20 @@
 import { injectable, inject } from "inversify";
-import { Employee } from "@prisma/client";
+import { Employee, EmployeePolicy } from "@prisma/client";
 import { IEmployeeService } from "../interfaces/IEmployeeService";
 import { IEmployeeRepository, PaginatedResult } from "../interfaces/IEmployeeRepository";
-import { CreateEmployeeDto, UpdateEmployeeDto } from "../dtos/employee.dto";
+import { IPolicyRepository } from "../interfaces/IPolicyRepository";
+import { CreateEmployeeDto, UpdateEmployeeDto, AssignPolicyToEmployeeDto } from "../dtos/employee.dto";
 import { TYPES } from "../constants/types";
 import { Logger } from "../utils/Logger";
-import { NotFoundError, ConflictError } from "../errors/AppError";
+import { NotFoundError, ConflictError, ValidationError } from "../errors/AppError";
 
 const logger = new Logger("EmployeeService");
 
 @injectable()
 export class EmployeeService implements IEmployeeService {
   constructor(
-    @inject(TYPES.EmployeeRepository) private employeeRepository: IEmployeeRepository
+    @inject(TYPES.EmployeeRepository) private employeeRepository: IEmployeeRepository,
+    @inject(TYPES.PolicyRepository) private policyRepository: IPolicyRepository
   ) {}
 
   async getAllEmployees(page: number, limit: number): Promise<PaginatedResult<Employee>> {
@@ -92,6 +94,55 @@ export class EmployeeService implements IEmployeeService {
       return employee;
     } catch (error) {
       logger.error("Failed to delete employee", error);
+      throw error;
+    }
+  }
+
+  async assignPolicyToEmployee(employeeId: number, data: AssignPolicyToEmployeeDto): Promise<EmployeePolicy> {
+    logger.info("Assigning policy to employee", { employeeId, policyId: data.policyId });
+    try {
+      // Validate employee exists
+      const employee = await this.employeeRepository.findById(employeeId);
+      if (!employee) {
+        throw new NotFoundError(`Employee with id ${employeeId} not found`);
+      }
+
+      // Validate policy exists
+      const policy = await this.policyRepository.findById(data.policyId);
+      if (!policy) {
+        throw new NotFoundError(`Policy with id ${data.policyId} not found`);
+      }
+
+      // Business Rule 1: startDate must be less than endDate (when endDate is provided)
+      if (data.endDate && data.startDate >= data.endDate) {
+        throw new ValidationError("startDate must be before endDate");
+      }
+
+      // Business Rule 2: Only one policy assignment can have null endDate
+      if (data.endDate === null || data.endDate === undefined) {
+        const existingNullEndDate = await this.employeeRepository.findPolicyAssignmentWithNullEndDate(employeeId);
+        if (existingNullEndDate) {
+          throw new ConflictError("Employee already has a policy assignment with no end date");
+        }
+      }
+
+      // Business Rule 3: No two policies with the same priority during overlapping time periods
+      const existingSamePriority = await this.employeeRepository.findPolicyAssignmentWithSamePriority(
+        employeeId,
+        data.priority,
+        data.startDate,
+        data.endDate ?? null
+      );
+      if (existingSamePriority) {
+        throw new ConflictError(`Policy with priority ${data.priority} is already assigned during the specified time period`);
+      }
+
+      // Create the policy assignment
+      const assignment = await this.employeeRepository.assignPolicyToEmployee(employeeId, data);
+      logger.info("Assigned policy to employee", { assignmentId: assignment.id });
+      return assignment;
+    } catch (error) {
+      logger.error("Failed to assign policy to employee", error);
       throw error;
     }
   }

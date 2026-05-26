@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
-import { Employee, PrismaClient } from "@prisma/client";
+import { Employee, EmployeePolicy, PrismaClient } from "@prisma/client";
 import { IEmployeeRepository, PaginatedResult } from "../interfaces/IEmployeeRepository";
-import { CreateEmployeeDto, UpdateEmployeeDto } from "../dtos/employee.dto";
+import { CreateEmployeeDto, UpdateEmployeeDto, AssignPolicyToEmployeeDto } from "../dtos/employee.dto";
 import { TYPES } from "../constants/types";
 
 @injectable()
@@ -115,5 +115,68 @@ export class EmployeeRepository implements IEmployeeRepository {
         updatedBy: true,
       },
     }) as Promise<Employee>;
+  }
+
+  public async findPolicyAssignmentWithSamePriority(
+    employeeId: number,
+    priority: number,
+    startDate: Date,
+    endDate: Date | null
+  ): Promise<EmployeePolicy | null> {
+    // Check for overlapping time periods with the same priority
+    // Overlap occurs when:
+    // - existing.startDate <= new.endDate (or new.endDate is null)
+    // - AND (existing.endDate is null OR existing.endDate >= new.startDate)
+    
+    if (endDate === null) {
+      // New assignment has no end date, check from startDate onwards
+      return this.prisma.employeePolicy.findFirst({
+        where: {
+          employeeId,
+          priority,
+          OR: [
+            { endDate: null },
+            { endDate: { gte: startDate } }
+          ]
+        }
+      });
+    } else {
+      // New assignment has an end date, check for overlap
+      return this.prisma.employeePolicy.findFirst({
+        where: {
+          employeeId,
+          priority,
+          startDate: { lte: endDate },
+          OR: [
+            { endDate: null },
+            { endDate: { gte: startDate } }
+          ]
+        }
+      });
+    }
+  }
+
+  public async findPolicyAssignmentWithNullEndDate(employeeId: number): Promise<EmployeePolicy | null> {
+    return this.prisma.employeePolicy.findFirst({
+      where: {
+        employeeId,
+        endDate: null
+      }
+    });
+  }
+
+  public async assignPolicyToEmployee(
+    employeeId: number,
+    data: AssignPolicyToEmployeeDto
+  ): Promise<EmployeePolicy> {
+    return this.prisma.employeePolicy.create({
+      data: {
+        employeeId,
+        policyId: data.policyId,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        priority: data.priority
+      }
+    });
   }
 }
