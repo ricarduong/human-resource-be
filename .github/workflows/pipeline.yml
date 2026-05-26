@@ -40,6 +40,43 @@ jobs:
         run: yarn test:unit
 
   # ─────────────────────────────────────────────
+  # Job 1b: Security Scan for Pull Requests
+  # Build image locally and scan for vulnerabilities
+  # Runs on every PR to catch security issues early
+  # ─────────────────────────────────────────────
+  security-scan-pr:
+    name: Security Scan (PR)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build local image for scanning
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          platforms: linux/amd64
+          tags: hrm-backend:scan-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: hrm-backend:scan-${{ github.sha }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+  # ─────────────────────────────────────────────
   # Job 2: Build & Push Docker image
   # Only runs on push to main, after lint-test passes
   # ─────────────────────────────────────────────
@@ -72,7 +109,7 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           # Only tag with SHA — avoid overwriting :latest which makes rollback harder
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/hrm-backend:sha-${{ steps.sha.outputs.short }}
           cache-from: type=gha
