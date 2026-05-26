@@ -43,6 +43,7 @@ export class AuthService implements IAuthService {
         googleId: payload.sub,
         email: payload.email,
         name: payload.name,
+        createdBy: 'system'
       });
     }
 

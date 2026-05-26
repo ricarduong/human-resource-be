@@ -27,6 +27,7 @@ const mockPaginatedResult: PaginatedResult<TeamDto> = {
 const mockCreateTeamDto: CreateTeamDto = {
   code: "TEAM-001",
   name: "Engineering",
+  createdBy: "system"
 };
 
 function buildMockRepo(overrides: Partial<ITeamRepository> = {}): ITeamRepository {

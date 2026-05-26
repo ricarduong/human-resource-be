@@ -106,6 +106,7 @@ describe("AuthService.googleLogin", () => {
         googleId: "google-sub-123",
         email: "user@example.com",
         name: "Test User",
+        createdBy: 'system'
       });
       expect(result.accessToken).toBe("mocked.jwt.token");
       expect(result.user).toMatchObject({
