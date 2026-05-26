@@ -13,3 +13,10 @@ export interface UpdateEmployeeDto {
   role?: Role;
   updatedBy?: string;
 }
+
+export interface AssignPolicyToEmployeeDto {
+  policyId: number;
+  startDate: Date;
+  endDate?: Date | null;
+  priority: number;
+}

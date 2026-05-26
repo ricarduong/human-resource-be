@@ -1,5 +1,5 @@
-import { Employee } from "@prisma/client";
-import { CreateEmployeeDto, UpdateEmployeeDto } from "../dtos/employee.dto";
+import { Employee, EmployeePolicy } from "@prisma/client";
+import { CreateEmployeeDto, UpdateEmployeeDto, AssignPolicyToEmployeeDto } from "../dtos/employee.dto";
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -15,4 +15,12 @@ export interface IEmployeeRepository {
   create(data: CreateEmployeeDto): Promise<Employee>;
   update(id: number, data: UpdateEmployeeDto): Promise<Employee>;
   delete(id: number): Promise<Employee>;
+  findPolicyAssignmentWithSamePriority(
+    employeeId: number,
+    priority: number,
+    startDate: Date,
+    endDate: Date | null
+  ): Promise<EmployeePolicy | null>;
+  findPolicyAssignmentWithNullEndDate(employeeId: number): Promise<EmployeePolicy | null>;
+  assignPolicyToEmployee(employeeId: number, data: AssignPolicyToEmployeeDto): Promise<EmployeePolicy>;
 }

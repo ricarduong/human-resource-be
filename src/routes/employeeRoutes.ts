@@ -2,7 +2,7 @@ import { Router } from "express";
 import { container } from "../containers/inversify.config";
 import { EmployeeController } from "../controllers/EmployeeController";
 import { TYPES } from "../constants/types";
-import { create as validateCreateEmployee } from "../middlewares/employee";
+import { create as validateCreateEmployee, assignPolicy as validateAssignPolicy } from "../middlewares/employee";
 
 const router = Router();
 const employeeController = container.get<EmployeeController>(TYPES.EmployeeController);
@@ -13,5 +13,6 @@ router.get("/:id", (req, res, next) => employeeController.getById(req, res, next
 router.post("/", validateCreateEmployee, (req, res, next) => employeeController.create(req, res, next));
 router.put("/:id", (req, res, next) => employeeController.update(req, res, next));
 router.delete("/:id", (req, res, next) => employeeController.delete(req, res, next));
+router.post("/:id/policies", validateAssignPolicy, (req, res, next) => employeeController.assignPolicy(req, res, next));
 
 export default router;
