@@ -6,6 +6,7 @@ export interface CreateUserData {
   googleId: string;
   email: string;
   name: string;
+  createdBy: string;
 }
 
 export interface UpdateUserData {
