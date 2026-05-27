@@ -27,6 +27,13 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(requestIdMiddleware);
+
+// Health Check - MUST be before rate limiter to avoid 429 from k8s probes
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'OK', message: 'HRM Service is running' });
+});
+
+// Rate limiting for API routes only (not health check)
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -34,11 +41,6 @@ app.use(rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },
 }));
-
-// Health Check
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({ status: 'OK', message: 'HRM Service is running' });
-});
 
 // Public routes (no auth required)
 app.use('/api/auth', authRoutes);
