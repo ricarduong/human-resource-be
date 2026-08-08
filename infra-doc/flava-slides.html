@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>Flava Compute Services</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/white.min.css" id="theme">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --reveal-font-family: 'Manrope', sans-serif;
+            --reveal-heading-font: 'Space Grotesk', sans-serif;
+            --ink: #10243b;
+            --muted: #64748b;
+            --teal: #0f8b8d;
+            --blue: #2f6fed;
+            --coral: #ef6f51;
+            --amber: #f1a208;
+            --surface: rgba(255, 255, 255, 0.78);
+            --line: rgba(16, 36, 59, 0.1);
+            --shadow: 0 24px 60px rgba(16, 36, 59, 0.14);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(15, 139, 141, 0.15), transparent 24%),
+                radial-gradient(circle at right 15% top 10%, rgba(47, 111, 237, 0.16), transparent 26%),
+                linear-gradient(180deg, #fefcf7 0%, #f2f6fb 55%, #eef5f2 100%);
+        }
+
+        .reveal {
+            color: var(--ink);
+            font-family: var(--reveal-font-family);
+        }
+
+        .reveal .slides {
+            text-align: left;
+        }
+
+        .reveal section {
+            padding: 8px;
+        }
+
+        .slide-shell {
+            min-height: 700px;
+            padding: 34px 38px;
+            border-radius: 34px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.66));
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(47, 111, 237, 0.1), transparent 24%),
+                radial-gradient(circle at bottom left, rgba(15, 139, 141, 0.12), transparent 30%);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            background: rgba(255, 255, 255, 0.88);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--teal);
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal), var(--blue));
+            box-shadow: 0 0 0 6px rgba(15, 139, 141, 0.12);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 0.85fr 1.15fr;
+            gap: 30px;
+            align-items: center;
+            min-height: 620px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1,
+        h2 {
+            margin: 16px 0 0;
+            font-family: var(--reveal-heading-font);
+            letter-spacing: -0.05em;
+            text-transform: none;
+            color: #16314f;
+        }
+
+        h1 {
+            font-size: 3.4rem;
+            line-height: 0.95;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            line-height: 0.96;
+        }
+
+        .lede {
+            max-width: 440px;
+            margin-top: 18px;
+            font-size: 0.98rem;
+            line-height: 1.45;
+            color: var(--muted);
+        }
+
+        .chip-row,
+        .mini-points,
+        .compare-notes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .chip,
+        .mini-points span,
+        .compare-notes span {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            color: #26415f;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(16, 36, 59, 0.08);
+        }
+
+        .hero-art,
+        .scene {
+            position: relative;
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.58));
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 24px 44px rgba(16, 36, 59, 0.1);
+            overflow: hidden;
+        }
+
+        .hero-art {
+            min-height: 580px;
+            padding: 14px;
+        }
+
+        .hero-art svg,
+        .scene svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .orbit-card {
+            position: absolute;
+            padding: 12px 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            box-shadow: 0 14px 30px rgba(16, 36, 59, 0.1);
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            animation: float 4.8s ease-in-out infinite;
+        }
+
+        .hero-art .orbit-card:nth-of-type(1) {
+            top: 40px;
+            right: 36px;
+            color: var(--coral);
+        }
+
+        .hero-art .orbit-card:nth-of-type(2) {
+            bottom: 34px;
+            left: 20px;
+            color: var(--amber);
+            animation-delay: 0.8s;
+        }
+
+        .hero-art .orbit-card:nth-of-type(3) {
+            bottom: 70px;
+            right: 60px;
+            color: var(--blue);
+            animation-delay: 1.4s;
+        }
+
+        .hero-art .orbit-card:nth-of-type(4) {
+            top: 96px;
+            left: 22px;
+            color: var(--teal);
+            animation-delay: 1.1s;
+        }
+
+        .overview-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 28px;
+        }
+
+        .overview-card {
+            padding: 22px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.84);
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            box-shadow: 0 18px 34px rgba(16, 36, 59, 0.08);
+        }
+
+        .overview-card strong {
+            display: block;
+            font-size: 1.15rem;
+            color: #18314f;
+            margin-bottom: 8px;
+        }
+
+        .overview-card p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            color: var(--muted);
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 0.58fr 1.42fr;
+            gap: 24px;
+            align-items: center;
+            min-height: 620px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scene {
+            min-height: 590px;
+            padding: 8px;
+        }
+
+        .caption {
+            margin-top: 20px;
+            font-size: 0.96rem;
+            color: #26415f;
+            font-weight: 700;
+            max-width: 250px;
+        }
+
+        .caption small {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--muted);
+        }
+
+        .text-compact .mini-points {
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .text-compact .mini-points span {
+            padding: 8px 12px;
+            font-size: 0.78rem;
+        }
+
+        .split.text-compact {
+            display: block;
+            min-height: 620px;
+        }
+
+        .split.text-compact > div:first-child {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            z-index: 3;
+            width: 240px;
+            padding: 16px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            box-shadow: 0 18px 30px rgba(16, 36, 59, 0.1);
+        }
+
+        .split.text-compact > div:first-child h2 {
+            margin-top: 10px;
+            font-size: 2rem;
+        }
+
+        .split.text-compact .caption {
+            margin-top: 12px;
+            max-width: none;
+        }
+
+        .split.text-compact .scene {
+            min-height: 620px;
+            padding: 0;
+        }
+
+        .split.text-compact .scene svg {
+            width: 100%;
+            height: 620px;
+        }
+
+        .compare-shell {
+            position: relative;
+            z-index: 1;
+            min-height: 620px;
+        }
+
+        .service-layout {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+            min-height: 620px;
+        }
+
+        .service-copy-card {
+            justify-content: flex-start;
+            gap: 8px;
+            padding: 22px 20px;
+        }
+
+        .service-copy-card h2 {
+            margin: 4px 0 2px;
+            font-size: 2.1rem;
+        }
+
+        .service-copy-card p {
+            font-size: 0.95rem;
+            line-height: 1.45;
+        }
+
+        .service-copy-card .compare-copy-footer {
+            margin-top: 10px;
+        }
+
+        .service-image-card {
+            padding: 14px;
+            justify-content: flex-start;
+        }
+
+        .service-image-card .compare-visual {
+            width: 100%;
+            height: 180px;
+        }
+
+        .service-group-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+            align-items: start;
+            min-height: 620px;
+        }
+
+        .service-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .conclusion-shell {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            min-height: 620px;
+        }
+
+        .conclusion-heading {
+            max-width: 680px;
+            padding: 8px 4px 0;
+        }
+
+        .conclusion-heading h2 {
+            margin: 0 0 8px;
+            font-size: 2.2rem;
+        }
+
+        .conclusion-heading p {
+            margin: 0;
+            font-size: 0.96rem;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        .conclusion-grid {
+            display: block;
+        }
+
+        .decision-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.84);
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            box-shadow: 0 18px 30px rgba(16, 36, 59, 0.08);
+        }
+
+        .decision-table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #1f4568;
+            background: rgba(239, 246, 255, 0.92);
+            border-bottom: 1px solid rgba(16, 36, 59, 0.08);
+        }
+
+        .decision-table tbody tr:nth-child(even) {
+            background: rgba(248, 250, 252, 0.78);
+        }
+
+        .decision-table tbody td {
+            padding: 14px 16px;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(16, 36, 59, 0.06);
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: #38506a;
+        }
+
+        .decision-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .decision-service {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #123253;
+        }
+
+        .decision-service::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal), var(--blue));
+            box-shadow: 0 0 0 5px rgba(15, 139, 141, 0.12);
+            flex: 0 0 auto;
+        }
+
+        .decision-fit {
+            font-weight: 700;
+            color: #1f4568;
+        }
+
+        .decision-example {
+            color: #24415d;
+        }
+
+        .cluster-explainer {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-height: 620px;
+        }
+
+        .cluster-explainer-heading {
+            max-width: 760px;
+            padding: 8px 4px 0;
+        }
+
+        .cluster-explainer-heading .eyebrow {
+            margin-bottom: 14px;
+        }
+
+        .cluster-explainer-heading h2 {
+            margin: 0 0 8px;
+            font-size: 2.2rem;
+        }
+
+        .cluster-explainer-heading p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        .cluster-explainer-heading h4 {
+            margin: 0 0 8px;
+            font-size: 1.1rem;
+            font-family: var(--reveal-heading-font);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #16314f;
+        }
+
+        .cluster-explainer-list {
+            margin: 0;
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            color: #24415d;
+        }
+
+        .cluster-explainer-list li {
+            padding: 0 0 0 4px;
+            margin: 0;
+            padding-left: 4px;
+            font-size: 0.98rem;
+            line-height: 1.62;
+        }
+
+        .cluster-explainer-list li + li {
+            padding-top: 10px;
+        }
+
+        .cluster-explainer-list strong {
+            color: #123253;
+        }
+
+        .cluster-explainer-list em {
+            font-style: normal;
+            font-weight: 700;
+            color: #1f4568;
+        }
+
+        .embedded-blueprint-shell {
+            min-height: 700px;
+            padding: 0;
+            background: #0b1329;
+            overflow: hidden;
+        }
+
+        .embedded-blueprint-frame {
+            display: block;
+            width: 100%;
+            height: 700px;
+            border: none;
+            background: #0b1329;
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px;
+            margin-top: 28px;
+            align-items: start;
+        }
+
+        .compare-pair {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .compare-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.84);
+            border: 1px solid rgba(16, 36, 59, 0.08);
+            box-shadow: 0 18px 30px rgba(16, 36, 59, 0.08);
+        }
+
+        .compare-copy-card {
+            justify-content: flex-start;
+            gap: 4px;
+            height: auto;
+            padding: 12px 14px;
+        }
+
+        .compare-copy-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .compare-image-card {
+            padding: 12px;
+            gap: 10px;
+            min-height: 188px;
+        }
+
+        .compare-arrow {
+            position: relative;
+            height: 34px;
+            margin: 0 auto;
+            width: 28px;
+            flex: 0 0 auto;
+        }
+
+        .compare-arrow::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 3px;
+            height: 22px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(15, 139, 141, 0.28), rgba(47, 111, 237, 0.92));
+        }
+
+        .compare-arrow::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 12px;
+            height: 12px;
+            transform: translateX(-50%) rotate(45deg);
+            border-right: 3px solid #2f6fed;
+            border-bottom: 3px solid #2f6fed;
+        }
+
+        .compare-card h3 {
+            margin: 0 0 4px;
+            font-size: 1.05rem;
+            color: #16314f;
+        }
+
+        .compare-card p {
+            margin: 0;
+            font-size: 0.74rem;
+            line-height: 1.3;
+            color: var(--muted);
+        }
+
+        .compare-visual {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 18px;
+            overflow: hidden;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 14px 30px rgba(16, 36, 59, 0.12);
+        }
+
+        .compare-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(7, 16, 30, 0.16));
+            pointer-events: none;
+        }
+
+        .compare-illustration-server {
+            background-color: #dbeafe;
+            background-image: url('empty_land.png');
+            aspect-ratio: 1408 / 768;
+            background-size: 114% auto;
+            background-position: 44% 48%;
+        }
+
+        .compare-illustration-server::before {
+            content: none;
+        }
+
+        .compare-illustration-kubernetes {
+            background-color: #dbeafe;
+            background-image: url('apartments.png');
+            aspect-ratio: 1316 / 688;
+            background-size: 104% auto;
+            background-position: 50% 38%;
+        }
+
+        .compare-illustration-kubernetes::before {
+            content: none;
+        }
+
+        .compare-illustration-batch {
+            background-color: #0f172a;
+            background-image: url('fully-furnished-apartment.jpg');
+            aspect-ratio: 991 / 478;
+            background-size: 114% auto;
+            background-position: 50% 44%;
+        }
+
+        .compare-illustration-batch::before {
+            content: none;
+        }
+
+        .compare-illustration-batch::after {
+            content: none;
+            pointer-events: none;
+        }
+
+        .compare-illustration-function {
+            background-color: #fef3c7;
+            background-image: url('hotel.jpg');
+            aspect-ratio: 1392 / 705;
+            background-size: 114% auto;
+            background-position: 46% 48%;
+        }
+
+        .compare-illustration-function::before {
+            content: none;
+        }
+
+        .compare-caption {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #26415f;
+        }
+
+        .compare-service-tag {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--teal);
+        }
+
+        .meter {
+            height: 10px;
+            margin-top: 8px;
+            border-radius: 999px;
+            background: rgba(16, 36, 59, 0.08);
+            overflow: hidden;
+        }
+
+        .meter span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--teal), var(--blue));
+        }
+
+        .compare-label {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #4b6178;
+        }
+
+        .scene .label {
+            font-family: var(--reveal-heading-font);
+            font-size: 20px;
+            letter-spacing: 0.04em;
+            fill: #17314f;
+        }
+
+        .pulse {
+            animation: pulse 2.4s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .float {
+            animation: float 5s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .drift {
+            animation: drift 6s linear infinite;
+        }
+
+        .blink {
+            animation: blink 1.8s steps(2, end) infinite;
+        }
+
+        .rise {
+            animation: rise 4.6s ease-in-out infinite;
+        }
+
+        .stagger-1 {
+            animation-delay: 0.35s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.7s;
+        }
+
+        .stagger-3 {
+            animation-delay: 1.05s;
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.06);
+                opacity: 0.72;
+            }
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translateX(-10px);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+
+            100% {
+                transform: translateX(-10px);
+            }
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.35;
+            }
+        }
+
+        @keyframes rise {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        @media (max-width: 680px) {
+            .hero,
+            .split {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .service-group-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .conclusion-grid {
+                overflow-x: auto;
+            }
+
+            .compare-image-card {
+                min-height: 188px;
+            }
+
+            .split.text-compact > div:first-child {
+                width: 210px;
+                padding: 14px;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.7rem;
+            }
+
+            h2 {
+                font-size: 2.1rem;
+            }
+        }
+
+        @media (max-height: 820px) {
+            .reveal section {
+                padding: 4px;
+            }
+
+            .slide-shell {
+                min-height: 610px;
+                padding: 22px 24px;
+            }
+
+            .service-group-grid,
+            .conclusion-shell,
+            .cluster-explainer {
+                min-height: 520px;
+            }
+
+            .conclusion-shell,
+            .cluster-explainer {
+                gap: 14px;
+            }
+
+            .conclusion-heading,
+            .cluster-explainer-heading {
+                padding-top: 2px;
+            }
+
+            .cluster-explainer-heading .eyebrow {
+                margin-bottom: 10px;
+            }
+
+            .conclusion-heading h2,
+            .cluster-explainer-heading h2 {
+                font-size: 2rem;
+                margin-bottom: 6px;
+            }
+
+            .cluster-explainer-heading h4 {
+                font-size: 0.95rem;
+                margin-bottom: 6px;
+            }
+
+            .conclusion-heading p,
+            .cluster-explainer-heading p {
+                font-size: 0.9rem;
+            }
+
+            .cluster-explainer-list {
+                gap: 24px;
+                padding-left: 20px;
+            }
+
+            .cluster-explainer-list li {
+                font-size: 0.86rem;
+                line-height: 1.5;
+            }
+
+            .cluster-explainer-list li + li {
+                padding-top: 8px;
+            }
+
+            .decision-table thead th,
+            .decision-table tbody td {
+                padding: 10px 12px;
+                font-size: 0.74rem;
+            }
+
+            .embedded-blueprint-shell {
+                min-height: 610px;
+            }
+
+            .embedded-blueprint-frame {
+                height: 610px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <div class="slide-shell">
+                    <div class="service-group-grid">
+                        <div class="service-stack">
+                            <div class="compare-card service-copy-card">
+                                <span class="eyebrow">Server</span>
+                                <p>Tự quyết nhiều nhất. Thuê máy chủ riêng ảo để xây dựng ứng dụng theo ý bạn.</p>
+                                <div class="compare-copy-footer">
+                                    <div class="meter"><span style="width: 24%"></span></div>
+                                    <div class="compare-label">Automation thấp</div>
+                                </div>
+                            </div>
+                            <div class="compare-card service-image-card">
+                                <div class="compare-visual compare-illustration-server" aria-label="Mảnh đất trống"></div>
+                            </div>
+                        </div>
+                        <div class="service-stack">
+                            <div class="compare-card service-copy-card">
+                                <span class="eyebrow">Kubernetes Engine</span>
+                                <p>Mang ứng dụng vào ở. Flava lo phần chung, bạn tập trung vận hành container và dịch vụ.</p>
+                                <div class="compare-copy-footer">
+                                    <div class="meter"><span style="width: 52%"></span></div>
+                                    <div class="compare-label">Automation trung bình</div>
+                                </div>
+                            </div>
+                            <div class="compare-card service-image-card">
+                                <div class="compare-visual compare-illustration-kubernetes" aria-label="Toà nhà chung cư"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="slide-shell">
+                    <div class="service-group-grid">
+                        <div class="service-stack">
+                            <div class="compare-card service-copy-card">
+                                <span class="eyebrow">App Runner</span>
+                                <p>Quản lý tự động lo từ A-Z, chỉ cần Source Code hoặc Docker Image</p>
+                                <div class="compare-copy-footer">
+                                    <div class="meter"><span style="width: 76%"></span></div>
+                                    <div class="compare-label">Automation cao</div>
+                                </div>
+                            </div>
+                            <div class="compare-card service-image-card">
+                                <div class="compare-visual compare-illustration-batch" aria-label="Sự kiện concert"></div>
+                            </div>
+                        </div>
+                        <div class="service-stack">
+                            <div class="compare-card service-copy-card">
+                                <span class="eyebrow">Function</span>
+                                <p>Code nhỏ, chạy ngắn và trả phí sát nhu cầu. Phù hợp tác vụ theo sự kiện.</p>
+                                <div class="compare-copy-footer">
+                                    <div class="meter"><span style="width: 94%"></span></div>
+                                    <div class="compare-label">Automation rất cao</div>
+                                </div>
+                            </div>
+                            <div class="compare-card service-image-card">
+                                <div class="compare-visual compare-illustration-function" aria-label="Khách sạn"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="slide-shell">
+                    <div class="conclusion-shell">
+                        <div class="conclusion-heading">
+                            <span class="eyebrow">Kết luận</span>
+                            <h2>Trường hợp nào dùng loại nào?</h2>
+                            <p>Chọn theo mức bạn muốn tự vận hành hạ tầng, cách workload chạy và tốc độ cần triển khai.</p>
+                        </div>
+                        <div class="conclusion-grid">
+                            <table class="decision-table" aria-label="Bảng chọn dịch vụ phù hợp">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Loại</th>
+                                        <th scope="col">Khi nào dùng</th>
+                                        <th scope="col">Ví dụ cụ thể</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="decision-service">Server</span></td>
+                                        <td><span class="decision-fit">Cần toàn quyền</span><br>Ứng dụng cần kiểm soát cao hoặc môi trường đặc thù.</td>
+                                        <td class="decision-example">ERP nội bộ, hệ thống legacy cần cấu hình riêng, ứng dụng có runtime đặc thù.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="decision-service">Kubernetes Engine</span></td>
+                                        <td><span class="decision-fit">Chạy container lâu dài</span><br>Workload chạy liên tục, nhiều service hoặc cần orchestration.</td>
+                                        <td class="decision-example">Nền tảng e-commerce microservices, API gateway + worker + frontend container.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="decision-service">App Runner</span></td>
+                                        <td><span class="decision-fit">Fully Managed</span><br>Dự án nhỏ cần chạy liên tục nhưng không muốn cấu hình phức tạp hay phải quản lý Auto-scaling,..</td>
+                                        <td class="decision-example">Web API, Web Server</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="decision-service">Function</span></td>
+                                        <td><span class="decision-fit">Xử lý theo sự kiện</span><br>Tác vụ ngắn, độc lập, phản ứng nhanh theo trigger.</td>
+                                        <td class="decision-example">Webhook xử lý thanh toán, resize ảnh sau upload, gửi thông báo khi có đơn hàng.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="slide-shell">
+                    <div class="cluster-explainer">
+                        <div class="cluster-explainer-heading">
+                            <span class="eyebrow">Cluster Management &amp; Configuration</span>
+                            <h4>Phân biệt 3 lớp: Cluster, Namespace và Context</h4>
+                        </div>
+                        <ul class="cluster-explainer-list">
+                            <li><strong>Cluster:</strong> Hạ tầng vật lý. Đây là tập hợp toàn bộ các máy chủ (Nodes) gộp lại.</li>
+                            <li><strong>Namespace:</strong> Phân vùng logic / Cluster ảo. Nó dùng để chia nhỏ một Cluster vật lý thành các vùng độc lập như dev, prod nhằm cô lập tài nguyên.</li>
+                            <li><strong>Context:</strong> Cấu hình phía Client. Đây thực chất là một bộ hồ sơ (profile) nằm trong file kubeconfig trên máy tính cá nhân của bạn, kết hợp giữa: Bạn là ai (User) + Bạn muốn vào Cluster nào + Ở Namespace nào.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="slide-shell embedded-blueprint-shell">
+                    <iframe
+                        class="embedded-blueprint-frame"
+                        src="k8s_management_blueprint.html"
+                        title="Kubernetes management blueprint"
+                        loading="lazy"
+                    ></iframe>
+                </div>
+            </section>
+
+            <section>
+                <div class="slide-shell">
+                    <div class="cluster-explainer">
+                        <div class="cluster-explainer-heading">
+                            <span class="eyebrow">K8s Resources</span>
+                            <h4>Các đối tượng cốt lõi để chạy, quản lý và mở đường vào ứng dụng</h4>
+                        </div>
+                        <ul class="cluster-explainer-list">
+                            <li><strong>Deployment:</strong> Workload Object / Controller. Vai trò của nó là quản lý vòng đời, số lượng bản sao (Replicas) và trạng thái của các Pod</li>
+                            <li><strong>Pod:</strong> Đây là thực thể nhỏ nhất, là nơi trực tiếp chứa và chạy các container ứng dụng.</li>
+                            <li><strong>Service &amp; Ingress:</strong> Networking Objects<br>+ Service lo việc định tuyến, cấp IP cố định và cân bằng tải nội bộ (Internal Networking).<br>+ Ingress lo việc quản lý cửa ngõ, cấu hình domain và định tuyến luồng traffic từ ngoài Internet vào trong (External Ingress Traffic Control).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="slide-shell embedded-blueprint-shell">
+                    <iframe
+                        class="embedded-blueprint-frame"
+                        src="k8s_interactive_blueprint.html"
+                        title="Kubernetes interactive blueprint"
+                        loading="lazy"
+                    ></iframe>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: false,
+            margin: 0.03,
+            transition: 'fade',
+            backgroundTransition: 'fade',
+            slideNumber: 'c/t'
+        });
+    </script>
+</body>
+
+</html>
