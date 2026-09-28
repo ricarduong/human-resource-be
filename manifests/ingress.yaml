@@ -8,8 +8,8 @@
 #   ingressClassName: traefik  →  ingressClassName: nginx
 #   and remove the traefik annotation.
 #
-# Access the API locally at: http://hrm.local/api/...
-# Add to /etc/hosts:  127.0.0.1  hrm.local
+# Access the API locally at: http://hrm.test/api/...
+# Add to /etc/hosts:  127.0.0.1  hrm.test
 # ---------------------------------------------------------------------------
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -24,7 +24,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: hrm.local
+    - host: hrm.test
       http:
         paths:
           - path: /

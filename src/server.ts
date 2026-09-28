@@ -18,6 +18,7 @@ import { Logger } from './utils/Logger';
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 const logger = new Logger('Server');
+const bypassRateLimitForLoadTest = process.env.LOAD_TEST_BYPASS_RATE_LIMIT === 'true';
 
 // Middlewares
 app.use(helmet());
@@ -34,13 +35,17 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // Rate limiting for API routes only (not health check)
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many requests, please try again later.' },
-}));
+if (!bypassRateLimitForLoadTest) {
+  app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' },
+  }));
+} else {
+  logger.warn('Rate limit bypassed because LOAD_TEST_BYPASS_RATE_LIMIT=true');
+}
 
 // Public routes (no auth required)
 app.use('/api/auth', authRoutes);
