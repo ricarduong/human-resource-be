@@ -3466,7 +3466,7 @@ mariadb@3.4.5:
     iconv-lite "^0.6.3"
     lru-cache "^10.4.3"
 
-mariadb@^3.5.3:
+mariadb@^3.5.4:
   version "3.5.4"
   resolved "https://registry.yarnpkg.com/mariadb/-/mariadb-3.5.4.tgz#ae58f9e6faf0d298f027b248a47ed7303c06cc7d"
   integrity sha512-3m0vdfgRkjle5/9hHl4R7rlVvnDA7QfuFSNkdIAQNROWKOS0J3b9IQK9HaZSCGEVKiDUbFXFiINfC+cmR5P/aA==
