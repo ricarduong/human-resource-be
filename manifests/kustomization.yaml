@@ -19,6 +19,9 @@ resources:
   - ingress.yaml
   - hpa.yaml
 
-commonLabels:
-  app.kubernetes.io/part-of: hrm
-  app.kubernetes.io/managed-by: kustomize
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: hrm
+      app.kubernetes.io/managed-by: kustomize
+    includeSelectors: false
+    includeTemplates: false
